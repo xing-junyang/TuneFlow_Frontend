@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const login = async (credentials: { username: string, password: string }) => {
+export const login = async (credentials) => {
   return axios.post('/api/users/login', credentials);
 };
 
