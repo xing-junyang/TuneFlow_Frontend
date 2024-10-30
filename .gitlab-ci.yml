@@ -93,12 +93,6 @@ code-quality:
         echo "Test success"
         exit 0
       fi
-  artifacts:
-    reports:
-      codequality: gl-code-quality-report.json
-    paths:
-      - gl-code-quality-report.json
-    expire_in: 1 week
   dependencies: []
   rules:
     - if: '$CODE_QUALITY_DISABLED'
