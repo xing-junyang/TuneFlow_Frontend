@@ -19,10 +19,13 @@ include:
   - template: SAST.gitlab-ci.yml
   - template: Dependency-Scanning.gitlab-ci.yml
 
-gemnasium-maven-dependency_scanning:  # 依赖检查
+nodejs-scan-sast:
   tags: [ docker ]
 
-semgrep-sast:  # 静态安全检查
+semgrep-sast:
+  tags: [ docker ]
+  
+gemnasium-dependency_scanning:
   tags: [ docker ]
 
 stages:          # List of stages for jobs, and their order of execution
