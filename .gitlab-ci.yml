@@ -15,6 +15,15 @@
 # https://docs.gitlab.com/ee/development/cicd/templates.html
 # This specific template is located at:
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
+include:
+  - template: SAST.gitlab-ci.yml
+  - template: Dependency-Scanning.gitlab-ci.yml
+
+gemnasium-maven-dependency_scanning:  # 依赖检查
+  tags: [ docker ]
+
+semgrep-sast:  # 静态安全检查
+  tags: [ docker ]
 
 stages:          # List of stages for jobs, and their order of execution
   - build
