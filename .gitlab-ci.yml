@@ -131,4 +131,5 @@ deploy-job:      # This job runs in the deploy stage.
     - echo "Building Docker image"
     - docker save demo/web-app -o demo.tar
     - sshpass -p "Nju221250001" scp -o StrictHostKeyChecking=no demo.tar zzq@20.6.130.122:~
-    - sshpass -p "Nju221250001" ssh -o StrictHostKeyChecking=no zzq@20.6.130.122 'docker container rm -f demo; docker load -i demo.tar; docker run -d --name demo -p 80:80 demo/front /bin/bash -c "nginx; tail -f /dev/null"'
+    - sshpass -p "Nju221250001" ssh -o StrictHostKeyChecking=no zzq@20.6.130.122 'docker container rm -f demo; docker load -i demo.tar; docker run -d --name demo -p 80:80 demo/web-app /bin/bash -c "nginx; tail -f /dev/null"'
+
