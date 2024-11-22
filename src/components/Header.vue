@@ -3,7 +3,7 @@
 		<div class="header-left">
 			<h1 class="title" @click="handleHome">
 				<span class="material-icons">music_note</span>
-				Music Player
+				Tune Flow
 			</h1>
 		</div>
 
