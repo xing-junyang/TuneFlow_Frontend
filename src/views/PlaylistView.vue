@@ -1,15 +1,15 @@
 <template>
   <div>
     <h2>Your Playlist</h2>
-    <Playlist />
+    <PlaylistComponent />
   </div>
 </template>
 
 <script>
-import Playlist from '@/components/Playlist.vue';
+import PlaylistComponent from '@/components/Playlist.vue';
 
 export default {
   name: 'PlaylistView',
-  components: { Playlist },
+  components: { PlaylistComponent },
 };
 </script>

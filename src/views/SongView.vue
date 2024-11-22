@@ -1,19 +1,19 @@
 <template>
   <div>
     <SongItem :song="song" />
-    <Rating />
+    <RatingComponent />
     <CommentSection />
   </div>
 </template>
 
 <script>
 import SongItem from '@/components/SongItem.vue';
-import Rating from '@/components/Rating.vue';
+import RatingComponent from '@/components/Rating.vue';
 import CommentSection from '@/components/CommentSection.vue';
 
 export default {
   name: 'SongView',
-  components: { SongItem, Rating, CommentSection },
+  components: { SongItem, RatingComponent, CommentSection },
   data() {
     return {
       song: { title: 'Sample Song', artist: 'Sample Artist' },

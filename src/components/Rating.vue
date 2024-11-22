@@ -6,7 +6,7 @@
 
 <script>
 export default {
-  name: 'Rating',
+  name: 'RatingComponent',
   methods: {
     rate(star) {
       console.log('Rated:', star);

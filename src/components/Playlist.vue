@@ -9,7 +9,7 @@
 
 <script>
 export default {
-  name: 'Playlist',
+  name: 'PlaylistComponent',
   data() {
     return {
       songs: [],
