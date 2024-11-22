@@ -2,16 +2,19 @@
 	<div id="app">
 		<HeaderComponent></HeaderComponent>
 		<router-view/>
+		<PlayerComponent songs="songs"></PlayerComponent>
 	</div>
 </template>
 
 <script>
 
 import HeaderComponent from "@/components/Header.vue";
+import PlayerComponent from "@/components/Player.vue";
 
 export default {
 	name: 'App',
 	components: {
+		PlayerComponent,
 		HeaderComponent
 	}
 }
