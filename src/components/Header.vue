@@ -1,7 +1,7 @@
 <template>
 	<header class="header">
 		<div class="header-left">
-			<h1 class="title">
+			<h1 class="title" @click="handleHome">
 				<span class="material-icons">music_note</span>
 				Music Player
 			</h1>
@@ -31,9 +31,15 @@ export default {
 	methods: {
 		handleLogin() {
 			this.$emit('login')
+			this.$router.push('/login')
 		},
 		handleRegister() {
 			this.$emit('register')
+			this.$router.push('/register')
+		},
+		handleHome() {
+			this.$emit('home')
+			this.$router.push('/')
 		}
 	}
 }
@@ -65,6 +71,7 @@ export default {
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
+	cursor: pointer;
 }
 
 .title .material-icons {
