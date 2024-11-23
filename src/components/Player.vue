@@ -1,13 +1,30 @@
 <template>
 	<div class="player-bar" :class="{ 'player-bar-show': show }">
 		<div class="player-left">
-			<div class="song-cover" :class="{ 'rotating': isPlaying }">
-				<img src="@/assets/default-cover.png" alt="cover">
+			<div class="song-container">
+				<div class="song-cover" :class="{ 'rotating': isPlaying }">
+					<img src="@/assets/default-cover.png" alt="cover">
+				</div>
+				<div class="song-info">
+					<div class="song-name">{{ currentSong.name || '未播放' }}</div>
+					<div class="song-artist">{{ currentSong.artist || '-' }}</div>
+				</div>
 			</div>
-			<div class="song-info">
-				<div class="song-name">{{ currentSong.name || '未播放' }}</div>
-				<div class="song-artist">{{ currentSong.artist || '-' }}</div>
+			<div class="player-right-thin">
+				<button class="volume-btn" @click="toggleMute">
+					<i :class="isMuted ? 'fas fa-volume-mute' : 'fas fa-volume-up'"></i>
+				</button>
+				<div
+					class="volume-slider"
+					ref="volumeSlider"
+					@mousedown.prevent="startVolumeChange"
+				>
+					<div class="volume-bg"></div>
+					<div class="volume-current" :style="{ width: volume + '%' }"></div>
+					<div class="volume-handle" :style="{ left: volume + '%' }"></div>
+				</div>
 			</div>
+
 		</div>
 
 		<div class="player-center">
@@ -352,6 +369,11 @@ export default {
 	to { transform: rotate(360deg); }
 }
 
+.song-container{
+	display: flex;
+	align-items: center;
+}
+
 .song-info {
 	color: #fff;
 }
@@ -470,6 +492,10 @@ export default {
 	justify-content: flex-end;
 }
 
+.player-right-thin {
+	display: none;
+}
+
 .volume-btn {
 	background: transparent;
 	border: none;
@@ -520,5 +546,67 @@ export default {
 
 .volume-slider:hover .volume-handle {
 	opacity: 1;
+}
+
+@media screen and (max-width: 920px) {
+	.player-bar {
+		padding: 0 10px;
+		height: 120px;
+		flex-direction: column;
+		justify-content: center;
+	}
+
+	.player-left {
+		width: calc(100% - 20px);
+		justify-content: space-between;
+		margin: 10px 10px;
+	}
+
+	.song-cover {
+		width: 40px;
+		height: 40px;
+	}
+
+	.player-center {
+		width: 100%;
+	}
+
+	.control-buttons {
+		margin-bottom: 8px;
+	}
+
+	.control-buttons button {
+		padding: 3px 8px;
+		font-size: 16px;
+	}
+
+	.play-btn {
+		font-size: 20px !important;
+		margin: 0 15px;
+	}
+
+	.mode-btn, .playlist-btn {
+		margin: 0 15px;
+	}
+
+	.player-right {
+		display: none;
+	}
+
+	.player-right-thin {
+		width: 100px;
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+	}
+
+	.progress-bar {
+		padding: 0 10px;
+	}
+
+	.time {
+		min-width: 35px;
+		font-size: 10px;
+	}
 }
 </style>
