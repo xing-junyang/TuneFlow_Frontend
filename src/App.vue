@@ -2,20 +2,32 @@
 	<div id="app">
 		<HeaderComponent></HeaderComponent>
 		<router-view/>
-		<PlayerComponent songs="songs"></PlayerComponent>
+		<PlayerComponent v-show="showPlayer"></PlayerComponent>
 	</div>
 </template>
 
 <script>
-
-import HeaderComponent from "@/components/Header.vue";
-import PlayerComponent from "@/components/Player.vue";
+import {computed} from 'vue'
+import {useRoute} from 'vue-router'
+import HeaderComponent from "@/components/Header.vue"
+import PlayerComponent from "@/components/Player.vue"
 
 export default {
 	name: 'App',
 	components: {
 		PlayerComponent,
 		HeaderComponent
+	},
+	setup() {
+		const route = useRoute()
+
+		const showPlayer = computed(() => {
+			return route.path !== '/login' && route.path !== '/register'
+		})
+
+		return {
+			showPlayer
+		}
 	}
 }
 </script>

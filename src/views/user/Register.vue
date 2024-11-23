@@ -27,17 +27,17 @@
 
 				<div class="form-group">
 					<label>
-						<span class="material-icons">email</span>
-						电子邮箱
+						<span class="material-icons">phone</span>
+						手机号码
 					</label>
 					<input
-						type="email"
-						v-model="email"
+						type="tel"
+						v-model="phone"
 						required
-						:class="{ 'has-value': email }"
-						placeholder="请输入邮箱"
+						:class="{ 'has-value': phone }"
+						placeholder="请输入手机号码"
 					>
-					<span class="password-match" v-if="email&&!isEmailValid" :class="{ error: !isEmailValid }">邮箱无效</span>
+					<span class="password-match" v-if="phone&&!isPhoneValid" :class="{ error: !isPhoneValid }">手机号无效</span>
 				</div>
 
 				<div class="form-group">
@@ -127,12 +127,14 @@
 
 <script>
 import {ref, computed} from 'vue'
+import {register} from "@/api/userApi";
+import router from "@/router";
 
 export default {
 	name: 'RegisterView',
 	setup() {
 		const username = ref('')
-		const email = ref('')
+		const phone = ref('')
 		const password = ref('')
 		const confirmPassword = ref('')
 		const showPassword = ref(false)
@@ -140,15 +142,15 @@ export default {
 		const agreeToTerms = ref(false)
 		const passwordStrength = ref(0)
 
-		const isEmailValid = computed(() => {
-			return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)
+		const isPhoneValid = computed(() => {
+			return /^1[3456789]\d{9}$/.test(phone.value)
 		})
 
 		const strengthText = computed(() => {
 			if (!password.value) return ''
 			switch (passwordStrength.value) {
 				case 1:
-					return '弱'
+					return '弱，请重新选择密码'
 				case 2:
 					return '中'
 				case 3:
@@ -166,7 +168,7 @@ export default {
 
 		const isFormValid = computed(() => {
 			return username.value &&
-				email.value &&
+				phone.value &&
 				password.value &&
 				confirmPassword.value &&
 				passwordsMatch.value &&
@@ -187,24 +189,37 @@ export default {
 		}
 
 		const handleRegister = () => {
-			// 处理注册逻辑
 			console.log({
 				username: username.value,
-				email: email.value,
+				phone: phone.value,
 				password: password.value,
 				agreeToTerms: agreeToTerms.value
 			})
+			register("USER", username.value, phone.value, password.value, "Create User")
+				.then(response => {
+					console.log(response)
+					if (response.data.code === '000') {
+						console.log('注册成功')
+						sessionStorage.setItem('phone', phone.value)
+						router.push('/login')
+					} else {
+						console.error('注册失败', response.data.msg)
+					}
+				})
+				.catch(error => {
+					console.error(error)
+				})
 		}
 
 		return {
 			username,
-			email,
+			phone,
 			password,
 			confirmPassword,
 			showPassword,
 			showConfirmPassword,
 			agreeToTerms,
-			isEmailValid,
+			isPhoneValid,
 			passwordStrength,
 			strengthText,
 			passwordsMatch,
@@ -222,7 +237,7 @@ export default {
 	min-height: 100vh;
 	display: flex;
 	justify-content: center;
-	align-items: center;
+	align-items: start;
 	background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
 	padding: 20px;
 }
@@ -232,6 +247,7 @@ export default {
 	backdrop-filter: blur(10px);
 	border-radius: 20px;
 	padding: 40px;
+	margin-top: 5vh;
 	width: 100%;
 	max-width: 420px;
 	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -286,7 +302,7 @@ export default {
 	color: #1db954;
 }
 
-input[type="email"],
+input[type="tel"],
 input[type="password"],
 input[type="text"] {
 	width: calc(100% - 40px);
@@ -474,7 +490,7 @@ input::placeholder {
 
 .submit-btn:not(:disabled):hover {
 	transform: translateY(-2px);
-	box-shadow: 0 6px 20px rgba(29, 185, 84, 0.4);
+	box-shadow: 0 6px 20px rgba(29, 185, 84, 0.21);
 }
 
 .submit-btn:disabled {
@@ -561,7 +577,7 @@ input:focus {
 		padding: 12px;
 	}
 
-	input[type="email"],
+	input[type="tel"],
 	input[type="password"],
 	input[type="text"] {
 		padding: 10px 14px;

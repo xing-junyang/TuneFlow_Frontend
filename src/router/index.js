@@ -4,6 +4,7 @@ import PlaylistView from '../views/PlaylistView.vue';
 import SongView from '../views/SongView.vue';
 import LoginView from "../views/user/Login.vue";
 import RegisterView from "@/views/user/Register.vue";
+import { hasLogin } from '@/utils/index.js';
 
 const routes = [
   { path: '/', component: HomeView },
@@ -16,6 +17,14 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes
+});
+
+router.beforeEach((to, from, next) => {
+  if((to.path === '/login' || to.path === '/register') && hasLogin()) {
+    next('/');
+  } else {
+    next();
+  }
 });
 
 export default router;

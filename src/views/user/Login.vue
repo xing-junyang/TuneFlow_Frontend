@@ -13,16 +13,17 @@
 			<form class="login-form" @submit.prevent="handleLogin">
 				<div class="form-group">
 					<label>
-						<span class="material-icons">email</span>
-						电子邮箱
+						<span class="material-icons">phone</span>
+						手机号码
 					</label>
 					<input
-						type="email"
-						v-model="email"
+						type="tel"
+						v-model="phone"
 						required
-						:class="{ 'has-value': email }"
-						placeholder="请输入邮箱"
+						:class="{ 'has-value': phone }"
+						placeholder="请输入手机号码"
 					>
+					<span class="password-match" v-if="phone&&!isPhoneValid" :class="{ error: !isPhoneValid }">手机号无效</span>
 				</div>
 
 				<div class="form-group">
@@ -75,34 +76,60 @@
 
 <script>
 import {ref, computed} from 'vue'
+import {login} from "@/api/userApi";
+import {getUserName} from "@/utils";
+import router from "@/router";
 
 export default {
 	name: 'LoginView',
 	setup() {
-		const email = ref('')
+		const phone = ref(sessionStorage.getItem('phone') || '')
 		const password = ref('')
 		const rememberMe = ref(false)
 		const showPassword = ref(false)
 
 		const isFormValid = computed(() => {
-			return email.value && password.value
+			return phone.value && password.value
+		})
+
+		const isPhoneValid = computed(() => {
+			return /^1[3456789]\d{9}$/.test(phone.value)
 		})
 
 		const handleLogin = () => {
 			// 处理登录逻辑
 			console.log({
-				email: email.value,
+				phone: phone.value,
 				password: password.value,
 				rememberMe: rememberMe.value
+			})
+
+			login(phone.value, password.value).then(res => {
+				console.log(res)
+				if (res.data.code === '000') {
+					console.log('登录成功')
+					sessionStorage.setItem('token', res.data.result)
+					if(rememberMe.value){
+						localStorage.setItem('token', res.data.result)
+					}
+					getUserName();
+					router.push('/')
+					location.reload()
+				} else {
+					console.error('登录失败： ',res.data.msg)
+				}
+			}).catch(err => {
+				console.error(err)
 			})
 		}
 
 		return {
-			email,
+			phone,
 			password,
 			rememberMe,
 			showPassword,
 			isFormValid,
+			isPhoneValid,
 			handleLogin
 		}
 	}
@@ -114,7 +141,7 @@ export default {
 	min-height: 100vh;
 	display: flex;
 	justify-content: center;
-	align-items: center;
+	align-items: start;
 	background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
 	padding: 20px;
 }
@@ -124,6 +151,7 @@ export default {
 	backdrop-filter: blur(10px);
 	border-radius: 20px;
 	padding: 40px;
+	margin-top: 10vh;
 	width: 100%;
 	max-width: 420px;
 	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -174,7 +202,7 @@ export default {
 	color: #1db954;
 }
 
-input[type="email"],
+input[type="tel"],
 input[type="password"] {
 	width: calc(100% - 40px);
 	padding: 12px 16px;
@@ -196,6 +224,21 @@ input:focus {
 input::placeholder {
 	color: rgba(255, 255, 255, 0.3);
 }
+
+.password-match {
+	display: block;
+	font-size: 0.8rem;
+	margin-top: 4px;
+	color: #1db954;
+	transition: color 0.3s ease;
+	font-weight: bold;
+}
+
+.password-match.error {
+	color: #ff4444;
+	font-weight: bold;
+}
+
 
 .password-input {
 	position: relative;
@@ -441,7 +484,7 @@ input::placeholder {
 		padding: 12px;
 	}
 
-	input[type="email"],
+	input[type="tel"],
 	input[type="password"] {
 		padding: 10px 14px;
 		font-size: 0.9rem;

@@ -1,9 +1,54 @@
 import axios from 'axios';
 
-export function login(credentials) {
-    return axios.post('/api/users/login', credentials);
+export function login(phone, password) {
+    const config = {
+        method: 'post',
+        url: '/api/users/login',
+        params: {
+            'phone': phone,
+            'password': password
+        },
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    };
+
+    return axios(config);
 }
 
 export function getUserInfo() {
-    return axios.get('/api/users/me');
+    const config = {
+        method: 'get',
+        url: '/api/users/getInformation',
+        headers: {
+            'Content-Type': 'application/json',
+            'Token': sessionStorage.getItem('token') == null? localStorage.getItem('token'): sessionStorage.getItem('token')
+        }
+    };
+
+    return axios(config);
+}
+
+// 用户注册
+export async function register(role, name, phone, password, description) {
+    const date = new Date();
+    const data = JSON.stringify({
+        "role": role,
+        "name": name,
+        "phone": phone,
+        "password": password,
+        "description": description,
+        "createTime": date,
+    });
+
+    const config = {
+        method: 'post',
+        url: '/api/users/register',
+        data: data,
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    };
+
+    return axios(config);
 }
