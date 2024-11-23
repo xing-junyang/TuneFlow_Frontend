@@ -203,7 +203,8 @@ export default {
 }
 
 input[type="tel"],
-input[type="password"] {
+input[type="password"],
+input[type="text"] {
 	width: calc(100% - 40px);
 	padding: 12px 16px;
 	border: 2px solid rgba(255, 255, 255, 0.1);
