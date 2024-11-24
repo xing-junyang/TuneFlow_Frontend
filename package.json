@@ -13,7 +13,8 @@
     "core-js": "^3.8.3",
     "vue": "^3.2.13",
     "vue-resource": "^1.5.3",
-    "vue-router": "^4.4.5"
+    "vue-router": "^4.4.5",
+    "vue3-eventbus": "^2.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
