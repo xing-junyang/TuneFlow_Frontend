@@ -25,3 +25,11 @@ export function addSongByDetail(id, name, artist, path, mark, description, creat
         createTime,
     });
 }
+
+export function isPlaying() {
+    return playlist.playing
+}
+
+export function getCurrentIndex() {
+    return playlist.currentIndex
+}
