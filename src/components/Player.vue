@@ -86,7 +86,7 @@
 	<!-- 播放列表上拉栏 -->
 	<div
 		class="playlist-drawer"
-		:class="{ 'drawer-open': showPlaylist }"
+		:class="{ 'drawer-open': showPlaylist && show }"
 	>
 		<div class="playlist-content">
 			<div class="playlist-header">
@@ -700,7 +700,7 @@ export default {
 	background: var(--color-background);
 	color: var(--color-text);
 	transform: translateY(100%);
-	opacity: 0.1;
+	opacity: 0;
 	transition: all 0.5s ease;
 	z-index: 1 !important;
 	border-top-right-radius: 12px;

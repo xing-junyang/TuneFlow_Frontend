@@ -30,7 +30,7 @@ export function getUserInfo() {
 }
 
 // 用户注册
-export async function register(role, name, phone, password, description) {
+export function register(role, name, phone, password, description) {
     const date = new Date();
     const data = JSON.stringify({
         "role": role,
