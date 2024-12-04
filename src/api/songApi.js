@@ -1,13 +1,57 @@
-import axios from 'axios';
+import request from '@/utils/request'
+// 请求拦截器添加token
+request.interceptors.request.use(
+    config => {
+        const token = sessionStorage.getItem('token')
+        if (token) {
+            config.headers['Authorization'] = `Bearer ${token}`
+        }
+        return config
+    },
+    error => {
+        return Promise.reject(error)
+    }
+)
 
-export function getSongDetails(songId) {
-    return axios.get(`/api/songs/${songId}`);
+// 创建歌单
+export function createSongList(data) {
+    return request({
+        url: '/api/songlists/create',
+        method: 'post',
+        data
+    })
 }
 
-export function getComments(songId) {
-    return axios.get(`/api/songs/${songId}/comments`);
+// 获取用户歌单
+export function getUserSongList() {
+    return request({
+        url: '/api/songlists/getSonglist',
+        method: 'get'
+    })
 }
 
-export function addComment(songId, commentData) {
-    return axios.post(`/api/songs/${songId}/comments`, commentData);
+// 搜索歌单
+export function searchSongList(name) {
+    return request({
+        url: '/api/songlists/search',
+        method: 'get',
+        params: { name }
+    })
+}
+
+// 删除歌单
+export function deleteSongList(songlistId) {
+    return request({
+        url: `/api/songlists/delete/${songlistId}`,
+        method: 'delete'
+    })
+}
+
+// 更新歌单
+export function updateSongList(data) {
+    return request({
+        url: '/api/songlists/update',
+        method: 'post',
+        data
+    })
 }

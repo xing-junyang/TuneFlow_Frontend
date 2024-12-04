@@ -16,3 +16,7 @@ export function getUserName() {
 export function hasLogin() {
     return (sessionStorage.getItem('token') != null || localStorage.getItem('token') != null)
 }
+
+export function getClientWidth() {
+    return document.documentElement.clientWidth
+  }

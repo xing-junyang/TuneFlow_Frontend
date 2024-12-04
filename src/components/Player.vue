@@ -673,7 +673,7 @@ export default {
 	bottom: 0;
 	background: #1db954;
 	border-radius: 2px;
-	//transition: width 0.05s linear;
+	transition: width 0.05s linear;
 }
 
 .volume-handle {

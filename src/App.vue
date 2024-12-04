@@ -1,42 +1,36 @@
 <template>
-	<div id="app">
+	<div class="root-app">
 		<HeaderComponent></HeaderComponent>
-		<router-view/>
+		<div class="main-container">
+			<nav class="sidebar-box">
+				<Sidebar v-if="showSideBar" :showPlayer="showPlayer" />
+			</nav>
+			<main class="content">
+				<router-view />
+			</main>
+		</div>
 		<PlayerBar :show="showPlayer"></PlayerBar>
 	</div>
 </template>
-
-<script>
-import {computed} from 'vue'
-import {useRoute} from 'vue-router'
+<script setup>
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import HeaderComponent from "@/components/Header.vue"
 import PlayerBar from "@/components/Player.vue"
+import Sidebar from "@/components/SiderBar/feature/index.vue"
 
-export default {
-	name: 'App',
-	components: {
-		PlayerBar,
-		HeaderComponent
-	},
-	setup() {
-		const route = useRoute()
+const route = useRoute()
 
-		const showPlayer = computed(() => {
-			if (route.path !== '/login' && route.path !== '/register') {
-				return true;
-			} else {
-				return false;
-			}
-		})
+const showPlayer = computed(() => {
+	return !['login', 'register'].includes(route.path.slice(1))
+})
 
-		return {
-			showPlayer
-		}
-	}
-}
+const showSideBar = computed(() => {
+	return !['login', 'register'].includes(route.path.slice(1))
+})
 </script>
 
-<style>
+<style lang="less">
 #app {
 	font-family: Avenir, Helvetica, Arial, sans-serif;
 	-webkit-font-smoothing: antialiased;
@@ -45,10 +39,17 @@ export default {
 	color: #2c3e50;
 }
 
+.root-app {
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+}
+
 /* CSS 变量 */
 :root {
 	--color-primary: #1db954;
 	--color-primary-dark: #1aa34a;
+	--color-background-page: #000000;
 	--color-background: #282828;
 	--color-background-light: #333333;
 	--color-background-hover: #404040;
@@ -58,11 +59,37 @@ export default {
 	--color-border: #404040;
 	--player-height: 80px;
 	--now-playing-width: 300px;
+	--sidebar-padding: 12px 16px 8px;
+	--sidebar-collapsed-padding: 8px;
+	--sidebar-collapsed-gap: 0;
+	--color-border: var(--color-text-secondary);
 }
 
 @media screen and (max-width: 920px) {
 	:root {
 		--player-height: 120px;
 	}
+}
+
+.main-container {
+	display: flex;
+	flex: 1;
+	min-height: calc(100vh - var(--player-height));
+
+	.sidebar-box {
+		padding: 8px;
+		background-color: var(--color-background-page);
+
+		.sidebar-container{
+			border-radius: 8px;
+			background-color: var(--color-background);
+		}
+	}
+}
+
+.content {
+	flex: 1;
+	padding: 24px;
+	margin-left: 0;
 }
 </style>
