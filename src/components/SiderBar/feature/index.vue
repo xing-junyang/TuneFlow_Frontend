@@ -79,12 +79,7 @@ import FilterToolbar from './components/FilterToolbar.vue'
 import LibraryIcon from './components/LibraryIcon.vue'
 import { userSongList } from '@/hooks/useSongs'
 import {
-  setPlaylistSongs,
   playSongFromPlaylist,
-  addSong,
-  addSongByDetail,
-  isPlaying,
-  getCurrentIndex
 } from '@/global/playlist';
 
 const { songs, addSong, updateSongList, deleteSongList } = userSongList()
