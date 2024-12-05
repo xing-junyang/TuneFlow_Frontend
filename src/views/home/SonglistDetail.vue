@@ -63,6 +63,8 @@ const playSong = (index) => {
 	console.log(playlist)
 };
 
+
+
 const addToPlayList = (index) => {
 	console.log('Adding to playlist:', index);
 	addSong(songs.value[index]);

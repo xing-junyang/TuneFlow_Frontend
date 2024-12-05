@@ -282,13 +282,12 @@ export default {
 
 		playSong(index) {
 			// console.log(this);
-			this.currentSongIndex = index
-			this.isPlaying = true
 			this.currentSong = this.playlist.songs[index]
+			this.isPlaying = true
+			this.currentSongIndex = index
 			this.playlist.playing = true;
 			this.playlist.currentIndex = index;
 			this.$refs.audioRef.currentTime = 0
-			this.$refs.audioRef.play()
 		},
 
 		removeSong(index) {
@@ -464,6 +463,17 @@ export default {
 				}
 			},
 			deep: true
+		},
+		playlist:{
+			handler(newPlaylist){
+				console.log("Watched playlist change", newPlaylist)
+				this.playlist = newPlaylist
+				if(newPlaylist.jumping){
+					console.log("Playing song from playlist", newPlaylist.currentIndex)
+					this.playSong(newPlaylist.currentIndex);
+				}
+			},
+			deep: true
 		}
 	},
 	mounted() {
@@ -619,7 +629,7 @@ export default {
 	bottom: 0;
 	background: #1db954;
 	border-radius: 2px;
-	transition: width 0.1s linear;
+	//transition: width 0.1s linear;
 }
 
 .progress-handle {
@@ -630,7 +640,7 @@ export default {
 	background: #fff;
 	border-radius: 50%;
 	transform: translate(-50%, -50%);
-	transition: all 0.2s;
+	//transition: all 0.2s;
 	opacity: 0;
 }
 
