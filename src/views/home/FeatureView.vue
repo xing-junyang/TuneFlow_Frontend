@@ -16,6 +16,17 @@ const albums = ref([
 		pictureUrl: "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/4e/52/eb/4e52eb12-24a5-e5eb-47f9-db4f7ff6b6ed/cover.jpg/632x632bb.webp"
 	},
 	{
+		id: 10,
+		name: "少女小漁的美麗與哀愁",
+		userId: "user9",
+		songsId: "33,34,35,36",
+		mark: "4.8",
+		description: "劉若英",
+		createTime: "2024-01-01T00:00:00+08:00",
+		type: "Album",
+		pictureUrl: "https://is1-ssl.mzstatic.com/image/thumb/Features/v4/00/05/6a/00056aee-533f-d233-5e1d-9f3dc4dc034b/dj.nsmfvven.jpg/592x592bb.webp"
+	},
+	{
 		id: 2,
 		name: "淡淡幽情",
 		userId: "user8",

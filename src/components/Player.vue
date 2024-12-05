@@ -259,7 +259,7 @@ export default {
 
 			console.log(this.currentSong.id)
 
-			if ( !this.currentSong || this.currentSong.id === undefined){//Not Loaded
+			if ( !this.currentSong || this.currentSong.id === undefined || this.currentSong.id === 0){//Not Loaded
 				console.log("Playing first song in playlist")
 				this.playSong(0)
 				return;

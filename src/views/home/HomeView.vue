@@ -16,6 +16,7 @@ export default {
 	background-color: var(--color-background-page);
 	display: flex;
 	height: 100%;
+	margin-bottom: var(--player-height);
 	flex-direction: column;
 	//justify-content: center;
 }
