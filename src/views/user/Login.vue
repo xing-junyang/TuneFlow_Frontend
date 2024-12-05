@@ -79,6 +79,8 @@ import {ref, computed} from 'vue'
 import {login} from "@/api/userApi";
 import {getUserName} from "@/utils";
 import router from "@/router";
+import {ElMessage} from "element-plus";
+
 
 export default {
 	name: 'LoginView',
@@ -108,6 +110,7 @@ export default {
 				console.log(res)
 				if (res.data.code === '000') {
 					console.log('登录成功')
+					ElMessage.success('登录成功')
 					sessionStorage.setItem('token', res.data.result)
 					if(rememberMe.value){
 						localStorage.setItem('token', res.data.result)
@@ -116,7 +119,9 @@ export default {
 					router.push('/')
 					location.reload()
 				} else {
+					ElMessage.error('登录失败： '+res.data.msg)
 					console.error('登录失败： ',res.data.msg)
+
 				}
 			}).catch(err => {
 				console.error(err)

@@ -129,6 +129,7 @@
 import {ref, computed} from 'vue'
 import {register} from "@/api/userApi";
 import router from "@/router";
+import {ElMessage} from "element-plus";
 
 export default {
 	name: 'RegisterView',
@@ -200,9 +201,11 @@ export default {
 					console.log(response)
 					if (response.data.code === '000') {
 						console.log('注册成功')
+						ElMessage.success('注册成功')
 						sessionStorage.setItem('phone', phone.value)
 						router.push('/login')
 					} else {
+						ElMessage.error('注册失败： ' + response.data.msg)
 						console.error('注册失败', response.data.msg)
 					}
 				})
