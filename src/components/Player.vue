@@ -694,7 +694,7 @@ export default {
 
 .playlist-drawer {
 	position: fixed;
-	left: 0;
+	right: 0;
 	bottom: var(--player-height);
 	width: var(--now-playing-width);
 	background: var(--color-background);
@@ -793,6 +793,7 @@ export default {
 
 .play-all-btn {
 	background: var(--color-primary);
+	border: 1px solid var(--color-border);
 	color: white;
 }
 
