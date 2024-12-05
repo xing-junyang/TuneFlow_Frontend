@@ -18,6 +18,8 @@
 include:
   - template: SAST.gitlab-ci.yml
   - template: Dependency-Scanning.gitlab-ci.yml
+  - template: DAST.gitlab-ci.yml
+
 
 nodejs-scan-sast:
   tags: [ docker ]
@@ -125,6 +127,36 @@ lint-test-job:   # This job also runs in the test stage.
     - echo "Linting code... This will take about 10 seconds."
 #    - sleep 10
     - echo "No lint issues found."
+
+dast:
+  stage: test
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_DRIVER: overlay2
+    DAST_DEFAULT_SITE: "http://20.6.130.122:8080/"  # 替换为实际部署的URL
+    DAST_EXCLUDED_URLS: "/exclude-path/*"  # 排除不必要的路径
+    DAST_SCANNER: "zap"  # 使用默认的OWASP ZAP扫描器
+  script:
+    - echo "Starting DAST scan..."
+    # 根据需要添加具体的DAST扫描命令，例如使用OWASP ZAP进行扫描
+    - zap.sh -daemon -port 8090 -host 0.0.0.0 -config api.disablekey=true
+    - zap-cli --zap-url http://localhost:8090 status -t 120
+    - zap-cli --zap-url http://localhost:8090 active-scan --spider --recursive https://your-production-site.com
+    - zap-cli --zap-url http://localhost:8090 report -o gl-dast-report.json -f json
+  artifacts:
+    reports:
+      dast: gl-dast-report.json
+    paths:
+      - gl-dast-report.json
+    expire_in: 1 week
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^feature\/.*$/'
+      when: never  # 根据需要限制扫描的分支
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "develop"'
+      when: always
 
 deploy-job:      # This job runs in the deploy stage.
   stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.

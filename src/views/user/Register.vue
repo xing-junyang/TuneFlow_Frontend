@@ -195,7 +195,7 @@ export default {
 				password: password.value,
 				agreeToTerms: agreeToTerms.value
 			})
-			register("USER", username.value, phone.value, password.value, "Create User")
+			register(username.value, phone.value, password.value)
 				.then(response => {
 					console.log(response)
 					if (response.data.code === '000') {

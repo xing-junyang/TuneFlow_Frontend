@@ -30,15 +30,11 @@ export function getUserInfo() {
 }
 
 // 用户注册
-export function register(role, name, phone, password, description) {
-    const date = new Date();
+export function register(name, phone, password) {
     const data = JSON.stringify({
-        "role": role,
         "name": name,
         "phone": phone,
         "password": password,
-        "description": description,
-        "createTime": date,
     });
 
     const config = {
