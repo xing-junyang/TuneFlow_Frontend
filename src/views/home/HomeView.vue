@@ -1,17 +1,18 @@
 <template>
-  <div class="home-view-container">
-    <h1>Welcome to the Music Player</h1>
-  </div>
+	<div class="home-view-container">
+<!--		<h1>Welcome to the Music Player</h1>-->
+		<router-view></router-view>
+	</div>
 </template>
 
 <script>
 export default {
-  name: 'HomeView',
+	name: 'HomeView',
 };
 </script>
 
 <style>
-.home-view-container{
+.home-view-container {
 	background-color: var(--color-background-page);
 	display: flex;
 	height: 100%;
