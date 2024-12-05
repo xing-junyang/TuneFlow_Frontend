@@ -9,7 +9,7 @@ import 'element-plus/theme-chalk/dark/css-vars.css'
 import './styles/dark/css-vars.css'
 
 
-axios.defaults.baseURL = ("http://localhost:8080")
+axios.defaults.baseURL = ("http://113.44.139.10:8080")
 axios.defaults.timeout = 30000;
 
 
