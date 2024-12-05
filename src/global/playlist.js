@@ -26,6 +26,7 @@ export function setPlaylistSongs(songs) {
 
 export function playSongFromPlaylist() {
     playlist.jumping = true
+    playlist.currentIndex = 0
     playlist.playing = true
 }
 

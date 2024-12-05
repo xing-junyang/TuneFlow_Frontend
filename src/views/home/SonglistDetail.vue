@@ -29,7 +29,7 @@ const songs = ref([
 		description: "迷幻电子音乐",
 		createTime: "2024-01-01T00:00:00+08:00",
 		genre: "Electronic",
-		audioUrl: "https://lw-sycdn.kuwo.cn/e3ba7444f9c4837767af8ff2e96d0432/675189d3/resource/30106/trackmedia/M500000tt98h4J9oL5.mp3",
+		audioUrl: "https://tuneflow.oss-cn-beijing.aliyuncs.com/M500000tt98h4J9oL5.mp3",
 		pictureUrl: "https://th.bing.com/th/id/R.d820b497cc152184d0f6620a9ec15714?rik=NdJJFHHnyGxSVg&riu=http%3a%2f%2fwallup.net%2fwp-content%2fuploads%2f2015%2f12%2f40105-gradient-simple_background-colorful-abstract.jpg&ehk=HXCvpXoX%2fSQHIUxEUk8uCjhkgJNzA46%2bX6VinvVPLN8%3d&risl=&pid=ImgRaw&r=0",
 		lyricUrl: "path/to/lyric1.txt"
 	},
@@ -41,9 +41,9 @@ const songs = ref([
 		description: "舒缓电子乐",
 		createTime: "2024-01-02T00:00:00+08:00",
 		genre: "Electronic",
-		audioUrl: "https://lw-sycdn.kuwo.cn/e3ba7444f9c4837767af8ff2e96d0432/675189d3/resource/30106/trackmedia/M500000tt98h4J9oL5.mp3",
+		audioUrl: "https://tuneflow.oss-cn-beijing.aliyuncs.com/M500000tt98h4J9oL5.mp3",
 		pictureUrl: "https://th.bing.com/th/id/R.d820b497cc152184d0f6620a9ec15714?rik=NdJJFHHnyGxSVg&riu=http%3a%2f%2fwallup.net%2fwp-content%2fuploads%2f2015%2f12%2f40105-gradient-simple_background-colorful-abstract.jpg&ehk=HXCvpXoX%2fSQHIUxEUk8uCjhkgJNzA46%2bX6VinvVPLN8%3d&risl=&pid=ImgRaw&r=0",
-		lyricUrl: "https://lw-sycdn.kuwo.cn/e3ba7444f9c4837767af8ff2e96d0432/675189d3/resource/30106/trackmedia/M500000tt98h4J9oL5.mp3"
+		lyricUrl: "path/to/lyric1.txt"
 	}
 ]);
 
@@ -63,7 +63,15 @@ const playSong = (index) => {
 	console.log(playlist)
 };
 
-
+const playAll = () => {
+	console.log('Playing all songs');
+	let songsToPlay = [];
+	for (let i = 0; i < songs.value.length; i++) {
+		songsToPlay.push(songs.value[i]);
+	}
+	setPlaylistSongs(songsToPlay);
+	playSongFromPlaylist();
+};
 
 const addToPlayList = (index) => {
 	console.log('Adding to playlist:', index);
@@ -95,7 +103,7 @@ onMounted(() => {
 
 		<!-- 播放控制栏 -->
 		<div class="controls">
-			<button class="play-all-btn">
+			<button class="play-all-btn" @click="playAll">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
 					<path d="M8 5v14l11-7z"/>
 				</svg>
