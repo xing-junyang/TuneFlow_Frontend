@@ -1,5 +1,6 @@
 <script setup>
 import { ref} from 'vue';
+import router from "@/router";
 
 // 模拟专辑数据
 const albums = ref([
@@ -110,6 +111,8 @@ const albums = ref([
 const navigateToAlbum = (albumId) => {
 	// 导航到专辑详情页面的逻辑
 	console.log('Navigate to album:', albumId);
+	//Navigate to the album detail page
+	router.push({ name: 'SonglistDetail', params: { song_list_id: albumId } });
 };
 </script>
 
@@ -243,7 +246,7 @@ const navigateToAlbum = (albumId) => {
 	-webkit-box-orient: vertical;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 820px) {
 	.feature-main-container {
 		padding: 20px;
 	}

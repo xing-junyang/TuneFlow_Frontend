@@ -12,7 +12,7 @@ const routes = [
     {
         path: '/', component: HomeView, redirect: '/feature', children: [
             {path: '/feature', component: FeatureView},
-            {path: '/song_list_detail', component: SonglistDetail},
+            {path: '/song_list_detail/:song_list_id', name: 'SonglistDetail', component: SonglistDetail}
         ]
     },
     {path: '/playlist', component: PlaylistView},
