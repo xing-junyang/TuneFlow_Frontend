@@ -238,7 +238,7 @@ export default {
 	display: flex;
 	justify-content: center;
 	align-items: start;
-	background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+	background: var(--color-background-page);
 	padding: 20px;
 }
 

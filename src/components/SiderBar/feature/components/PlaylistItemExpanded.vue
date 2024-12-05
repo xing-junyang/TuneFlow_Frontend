@@ -92,15 +92,14 @@ defineEmits(['play'])
             }
 
             .play-button-wrapper {
-                opacity: 0;
+                //opacity: 0;
                 position: absolute;
-                right: 4px;
-                bottom: 4px;
-                transition: opacity 0.2s ease;
+                right: 10px;
+                bottom: 10px;
 
                 .play-button {
-                    width: 32px;
-                    height: 32px;
+                    width: 28px;
+                    height: 28px;
                     border-radius: 50%;
                     background: var(--color-primary);
                     border: none;
@@ -108,12 +107,12 @@ defineEmits(['play'])
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    transition: all 0.2s ease;
+                    transition: opacity 0.2s ease;
                     box-shadow: 0 8px 8px rgba(0,0,0,.3);
-
+                    opacity: 0;
                     &:hover {
                         transform: scale(1.04);
-                        background: var(--color-primary-bright);
+                        opacity: 1;
                     }
 
                     .icon-wrapper {
@@ -122,17 +121,17 @@ defineEmits(['play'])
                         justify-content: center;
 
                         svg {
-                            width: 16px;
-                            height: 16px;
+                            width: 18px;
+                            height: 18px;
                             fill: black;
                         }
                     }
                 }
             }
 
-            &:hover .play-button-wrapper {
-                opacity: 1;
-            }
+            //&:hover .play-button-wrapper {
+            //    opacity: 1;
+            //}
         }
     }
 

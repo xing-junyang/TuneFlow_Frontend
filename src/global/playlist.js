@@ -1,5 +1,16 @@
 import { reactive } from 'vue'
-
+/*
+    song: {
+					id: Number,
+					name: String,
+					artist: String,
+					path: String,
+					mark: String,
+					description: String,
+					createTime: String
+			}
+	songs: song[]
+ */
 export const playlist = reactive({
     songs: [],
     currentIndex: 0,
@@ -8,6 +19,10 @@ export const playlist = reactive({
 
 export function setPlaylistSongs(songs) {
     playlist.songs = songs
+}
+
+export function playSongFromPlaylist() {
+    playlist.playing = true
 }
 
 export function addSong(song) {

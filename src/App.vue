@@ -89,7 +89,7 @@ const showSideBar = computed(() => {
 
 .content {
 	flex: 1;
-	padding: 24px;
+	//padding: 24px;
 	margin-left: 0;
 }
 </style>

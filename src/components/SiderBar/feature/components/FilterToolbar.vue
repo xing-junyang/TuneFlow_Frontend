@@ -251,6 +251,7 @@ const handleSearchBlur = () => {
         color: var(--color-text-secondary);
         font-size: 12px;
         font-weight: 700;
+        font-family: 'Noto Sans SC', sans-serif;
     }
 }
 
@@ -308,6 +309,9 @@ const handleSearchBlur = () => {
 </style>
 
 <style>
+.el-popper{
+	font-family: 'Noto Sans SC', sans-serif;
+}
 .el-popper.sort-popover {
     background-color: #282828 !important;
     border: none;

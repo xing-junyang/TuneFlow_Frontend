@@ -34,7 +34,7 @@ const handleDragEnd = () => {
 <style scoped>
 .resize-handle {
   position: absolute;
-  right: -4px;
+  right: -8px;
   top: 0;
   bottom: 0;
   width: 8px;
@@ -46,12 +46,12 @@ const handleDragEnd = () => {
 }
 
 .resize-handle.is-collapsed {
-  right: -6px;
-  width: 12px;
+  right: -8px;
+  width: 8px;
 }
 
 .resize-handle.is-collapsed:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0);
 }
 
 .resize-line {
