@@ -120,6 +120,8 @@ onMounted(() => {
 
 <style scoped>
 .song-list-detail-main-container {
+	container-type: inline-size;
+	container-name: song-list-detail;
 	display: flex;
 	height: 95%;
 	flex-direction: column;
@@ -166,8 +168,9 @@ onMounted(() => {
 
 .album-description {
 	font-size: 16px;
+	text-align: start;
 	color: #b3b3b3;
-	margin: 0 0 16px 0;
+	margin: 0 0 30px 0;
 	line-height: 1.5;
 }
 
@@ -256,7 +259,7 @@ td {
 	object-fit: cover;
 }
 
-@media (max-width: 820px) {
+@container song-list-detail (max-width: 820px) {
 	.song-list-detail-main-container {
 		padding: 20px;
 	}
@@ -274,9 +277,16 @@ td {
 		font-size: 32px;
 	}
 
-	th:nth-child(4),
-	td:nth-child(4) {
+	th:last-child,
+	td:last-child {
 		display: none;
+	}
+}
+
+@container song-list-detail (max-width: 1200px) {
+	.album-cover{
+		width: 240px;
+		height: 240px;
 	}
 }
 </style>
