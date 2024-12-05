@@ -75,21 +75,21 @@ const showSideBar = computed(() => {
 	display: flex;
 	flex: 1;
 	min-height: calc(100vh - var(--player-height));
+}
 
-	.sidebar-box {
-		padding: 8px;
-		background-color: var(--color-background-page);
+.sidebar-box {
+	padding: 8px;
+	background-color: var(--color-background-page);
+}
 
-		.sidebar-container{
-			border-radius: 8px;
-			background-color: var(--color-background);
-		}
-	}
+.sidebar-container{
+	border-radius: 8px;
+	background-color: var(--color-background);
 }
 
 .content {
 	flex: 1;
-	//padding: 24px;
 	margin-left: 0;
+	overflow: auto;
 }
 </style>
