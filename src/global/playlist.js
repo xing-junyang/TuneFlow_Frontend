@@ -20,8 +20,8 @@ export const playlist = reactive({
 
 
 export function setPlaylistSongs(songs) {
-    playlist.songs = songs
     playlist.jumping = false
+    playlist.songs = songs
 }
 
 export function playSongFromPlaylist() {
@@ -57,4 +57,11 @@ export function isPlaying() {
 export function getCurrentIndex() {
     playlist.jumping = true
     return playlist.currentIndex
+}
+
+export function clearPlaylist() {
+    playlist.jumping = false
+    playlist.songs = []
+    playlist.currentIndex = 0
+    playlist.playing = false
 }

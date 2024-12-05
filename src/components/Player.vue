@@ -3,7 +3,7 @@
 		<div class="player-left">
 			<div class="song-container">
 				<div class="song-cover">
-					<img :src="currentSong.pictureUrl || 'https://discussions.apple.com/content/attachment/592590040'" alt="cover">
+					<img :src="(currentSong.pictureUrl || 'https://discussions.apple.com/content/attachment/592590040')" alt="cover">
 				</div>
 				<div class="song-info">
 					<div class="song-name">{{ currentSong.name || '未播放' }}</div>
@@ -113,7 +113,7 @@
 				</button>
 				<button
 					class="delete-btn"
-					@click="clearPlaylist"
+					@click="clickClearPlaylist"
 				>
 					<i class="fas fa-trash-alt"></i>
 					<span>清空列表</span>
@@ -197,7 +197,7 @@
 </template>
 
 <script>
-import {playlist} from "@/global/playlist";
+import {clearPlaylist, playlist} from "@/global/playlist";
 
 export default {
 	name: 'PlayerBar',
@@ -255,11 +255,17 @@ export default {
 
 	methods: {
 		togglePlay() {
-			if (!this.currentSong){//Not Loaded
-				this.currentSong = this.playlist.songs[0]
+			if(this.playlist.songs.length === 0) return;
+
+			console.log(this.currentSong.id)
+
+			if ( !this.currentSong || this.currentSong.id === undefined){//Not Loaded
+				console.log("Playing first song in playlist")
+				this.playSong(0)
+				return;
 			}
 
-			if (!this.currentSong.audioUrl ) return;
+			if (this.currentSong.audioUrl === '') return;
 
 			if (this.isPlaying) {
 				this.$refs.audioRef.pause()
@@ -433,15 +439,29 @@ export default {
 			this.playlist.playing = true
 		},
 
-		clearPlaylist(){
-			this.playlist.songs = []
-			this.playlist.playing = false
-			this.playlist.currentIndex = 0
-			this.currentSong = {}
+		resetCurrentSong(){
+			this.$refs.audioRef.pause()
+			this.currentSong = {
+				id: 0,
+				name: '',
+				artist: '',
+				audioUrl: '',
+				pictureUrl: 'https://discussions.apple.com/content/attachment/592590040',
+				genre: '',
+				lyricUrl: '',
+				mark: '',
+				description: '',
+				createTime: ''
+			}
 			this.currentSongIndex = 0
 			this.isPlaying = false
 			this.duration = 0
 			this.currentTime = 0
+		},
+
+		clickClearPlaylist(){
+			this.resetCurrentSong()
+			clearPlaylist();
 		},
 
 		checkScreenWidth() {
@@ -455,6 +475,9 @@ export default {
 	watch: {
 		currentSong: {
 			handler(newSong) {
+				if(!newSong||newSong.id===undefined||newSong.id===''){
+					return
+				}
 				if (newSong.audioUrl) {
 					this.$nextTick(() => {
 						this.$refs.audioRef.play()
