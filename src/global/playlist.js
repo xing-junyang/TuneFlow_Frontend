@@ -17,6 +17,7 @@ export const playlist = reactive({
     playing: false,
 })
 
+
 export function setPlaylistSongs(songs) {
     playlist.songs = songs
 }
@@ -24,6 +25,7 @@ export function setPlaylistSongs(songs) {
 export function playSongFromPlaylist() {
     playlist.playing = true
 }
+
 
 export function addSong(song) {
     playlist.songs.push(song)

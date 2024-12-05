@@ -78,6 +78,10 @@ import PlaylistItemCollapsed from './components/PlaylistItemCollapsed.vue'
 import FilterToolbar from './components/FilterToolbar.vue'
 import LibraryIcon from './components/LibraryIcon.vue'
 import { userSongList } from '@/hooks/useSongs'
+import {
+  playSongFromPlaylist,
+} from '@/global/playlist';
+
 const { songs, addSong, updateSongList, deleteSongList } = userSongList()
 
 defineProps({
@@ -134,8 +138,9 @@ const playlists = computed(() => {
 })
 
 const handlePlay = (playlist) => {
-    const song = songs.value.find(s => s.id.toString() === playlist.id)
-    console.log(song)
+    const song = songs.value.find(s => s.id.toString() === playlist.id);
+    playSongFromPlaylist();
+    console.log(song);
 
 }
 
