@@ -2,8 +2,8 @@
 	<div class="player-bar" :class="{ 'player-bar-show': show }">
 		<div class="player-left">
 			<div class="song-container">
-				<div class="song-cover" :class="{ 'rotating': isPlaying }">
-					<img src="@/assets/default-cover.png" alt="cover">
+				<div class="song-cover">
+					<img :src="currentSong.pictureUrl || 'https://discussions.apple.com/content/attachment/592590040'" alt="cover">
 				</div>
 				<div class="song-info">
 					<div class="song-name">{{ currentSong.name || '未播放' }}</div>
@@ -77,7 +77,7 @@
 
 		<audio
 			ref="audioRef"
-			:src="currentSong.path"
+			:src="currentSong.audioUrl"
 			@timeupdate="onTimeUpdate"
 			@loadedmetadata="onLoadMetadata"
 			@ended="onEnded"
@@ -144,7 +144,7 @@
 						@click="playSong(index)"
 					>
 						<div class="song-index">
-							<span v-if="currentSongIndex !== index">{{ index + 1 }}</span>
+							<span v-if="currentSongIndex !== index || !isPlaying">{{ index + 1 }}</span>
 							<i v-else class="fas fa-volume-up playing-icon"></i>
 						</div>
 
@@ -224,7 +224,10 @@ export default {
 					id: Number,
 					name: String,
 					artist: String,
-					path: String,
+					audioUrl: String,
+					pictureUrl: String,
+					genre: String,
+					lyricUrl: String,
 					mark: String,
 					description: String,
 					createTime: String
@@ -252,7 +255,11 @@ export default {
 
 	methods: {
 		togglePlay() {
-			if (!this.currentSong.path) return
+			if (!this.currentSong){//Not Loaded
+				this.currentSong = this.playlist.songs[0]
+			}
+
+			if (!this.currentSong.audioUrl ) return;
 
 			if (this.isPlaying) {
 				this.$refs.audioRef.pause()
@@ -274,12 +281,14 @@ export default {
 		},
 
 		playSong(index) {
+			// console.log(this);
 			this.currentSongIndex = index
 			this.isPlaying = true
 			this.currentSong = this.playlist.songs[index]
-
 			this.playlist.playing = true;
 			this.playlist.currentIndex = index;
+			this.$refs.audioRef.currentTime = 0
+			this.$refs.audioRef.play()
 		},
 
 		removeSong(index) {
@@ -296,11 +305,19 @@ export default {
 		prevSong() {
 			if (this.playlist.songs.length === 0) return
 
+			if(this.isPlaying){
+				this.$refs.audioRef.pause();
+				this.isPlaying = false
+				this.playlist.playing = false;
+			}
+
 			if (this.playMode === 'random') {
 				this.currentSongIndex = Math.floor(Math.random() * this.playlist.songs.length)
 			} else if (this.playMode === 'single') {
+				this.isPlaying = true
 				this.$refs.audioRef.currentTime = 0
 				this.$refs.audioRef.play()
+				return;
 			} else {
 				this.currentSongIndex = this.currentSongIndex - 1
 				if (this.currentSongIndex < 0) {
@@ -410,8 +427,11 @@ export default {
 
 		playAll(){
 			this.currentSongIndex = 0
-			this.isPlaying = true
 			this.currentSong = this.playlist.songs[0]
+			this.isPlaying = true
+			this.playlist.playing = true
+			this.playlist.currentIndex = 0
+			this.playlist.playing = true
 		},
 
 		clearPlaylist(){
@@ -421,6 +441,8 @@ export default {
 			this.currentSong = {}
 			this.currentSongIndex = 0
 			this.isPlaying = false
+			this.duration = 0
+			this.currentTime = 0
 		},
 
 		checkScreenWidth() {
@@ -434,7 +456,7 @@ export default {
 	watch: {
 		currentSong: {
 			handler(newSong) {
-				if (newSong.path) {
+				if (newSong.audioUrl) {
 					this.$nextTick(() => {
 						this.$refs.audioRef.play()
 						this.isPlaying = true
@@ -498,19 +520,6 @@ export default {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
-}
-
-.rotating {
-	animation: rotate 20s linear infinite;
-}
-
-@keyframes rotate {
-	from {
-		transform: rotate(0deg);
-	}
-	to {
-		transform: rotate(360deg);
-	}
 }
 
 .song-container {
@@ -673,7 +682,7 @@ export default {
 	bottom: 0;
 	background: #1db954;
 	border-radius: 2px;
-	transition: width 0.05s linear;
+	//transition: width 0.05s linear;
 }
 
 .volume-handle {
@@ -883,6 +892,7 @@ export default {
 	color: var(--color-text-secondary);
 	font-size: 14px;
 	white-space: nowrap;
+	text-align: start;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }

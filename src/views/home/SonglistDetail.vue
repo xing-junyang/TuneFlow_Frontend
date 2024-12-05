@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import {setPlaylistSongs, playSongFromPlaylist, playlist, addSong} from "@/global/playlist";
 
 const route = useRoute();
 const songListId = route.params.song_list_id;
@@ -28,7 +29,7 @@ const songs = ref([
 		description: "迷幻电子音乐",
 		createTime: "2024-01-01T00:00:00+08:00",
 		genre: "Electronic",
-		audioUrl: "path/to/audio1.mp3",
+		audioUrl: "https://lw-sycdn.kuwo.cn/e3ba7444f9c4837767af8ff2e96d0432/675189d3/resource/30106/trackmedia/M500000tt98h4J9oL5.mp3",
 		pictureUrl: "https://th.bing.com/th/id/R.d820b497cc152184d0f6620a9ec15714?rik=NdJJFHHnyGxSVg&riu=http%3a%2f%2fwallup.net%2fwp-content%2fuploads%2f2015%2f12%2f40105-gradient-simple_background-colorful-abstract.jpg&ehk=HXCvpXoX%2fSQHIUxEUk8uCjhkgJNzA46%2bX6VinvVPLN8%3d&risl=&pid=ImgRaw&r=0",
 		lyricUrl: "path/to/lyric1.txt"
 	},
@@ -40,9 +41,9 @@ const songs = ref([
 		description: "舒缓电子乐",
 		createTime: "2024-01-02T00:00:00+08:00",
 		genre: "Electronic",
-		audioUrl: "path/to/audio2.mp3",
+		audioUrl: "https://lw-sycdn.kuwo.cn/e3ba7444f9c4837767af8ff2e96d0432/675189d3/resource/30106/trackmedia/M500000tt98h4J9oL5.mp3",
 		pictureUrl: "https://th.bing.com/th/id/R.d820b497cc152184d0f6620a9ec15714?rik=NdJJFHHnyGxSVg&riu=http%3a%2f%2fwallup.net%2fwp-content%2fuploads%2f2015%2f12%2f40105-gradient-simple_background-colorful-abstract.jpg&ehk=HXCvpXoX%2fSQHIUxEUk8uCjhkgJNzA46%2bX6VinvVPLN8%3d&risl=&pid=ImgRaw&r=0",
-		lyricUrl: "path/to/lyric2.txt"
+		lyricUrl: "https://lw-sycdn.kuwo.cn/e3ba7444f9c4837767af8ff2e96d0432/675189d3/resource/30106/trackmedia/M500000tt98h4J9oL5.mp3"
 	}
 ]);
 
@@ -52,8 +53,19 @@ const formatDuration = (seconds) => {
 	return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
 };
 
-const playSong = (songId) => {
-	console.log('Playing song:', songId);
+const playSong = (index) => {
+	console.log('Playing song:', index);
+	let songsToPlay = [];
+	console.log(songs.value[index]);
+	songsToPlay.push(songs.value[index])
+	setPlaylistSongs(songsToPlay)
+	playSongFromPlaylist();
+	console.log(playlist)
+};
+
+const addToPlayList = (index) => {
+	console.log('Adding to playlist:', index);
+	addSong(songs.value[index]);
 };
 
 onMounted(() => {
@@ -94,6 +106,7 @@ onMounted(() => {
 			<table>
 				<thead>
 				<tr>
+					<th></th>
 					<th>#</th>
 					<th>标题</th>
 					<th>艺术家</th>
@@ -102,15 +115,19 @@ onMounted(() => {
 				</tr>
 				</thead>
 				<tbody>
-				<tr v-for="(song, index) in songs" :key="song.id" @click="playSong(song.id)" class="song-row">
-					<td>{{ index + 1 }}</td>
-					<td class="song-title">
+				<tr v-for="(song, index) in songs" :key="song.id" class="song-row">
+					<td class="add-to-playlist-btn" @click="addToPlayList(index)">
+<!--						add to playlist button-->
+						<span class="material-icons">playlist_add</span>
+					</td>
+					<td @click="playSong(index)">{{ index + 1 }}</td>
+					<td class="song-title" @click="playSong(index)">
 						<img :src="song.pictureUrl" :alt="song.name" class="song-thumbnail">
 						<span>{{ song.name }}</span>
 					</td>
-					<td>{{ song.artist }}</td>
-					<td>{{ song.genre }}</td>
-					<td>{{ formatDuration(180) }}</td> <!-- 示例固定时长 -->
+					<td @click="playSong(index)">{{ song.artist }}</td>
+					<td @click="playSong(index)">{{ song.genre }}</td>
+					<td @click="playSong(index)">{{ formatDuration(180) }}</td> <!-- 示例固定时长 -->
 				</tr>
 				</tbody>
 			</table>
@@ -229,6 +246,11 @@ th {
 	border-bottom: 1px solid #333;
 	color: #b3b3b3;
 	font-weight: normal;
+}
+
+.add-to-playlist-btn{
+	cursor: pointer;
+	width: 24px;
 }
 
 .song-row {
