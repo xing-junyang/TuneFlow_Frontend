@@ -157,6 +157,7 @@ defineEmits(['play'])
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
+                    text-align: start;
                     display: block;
                 }
             }

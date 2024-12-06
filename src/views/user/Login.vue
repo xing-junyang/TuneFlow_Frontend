@@ -115,13 +115,13 @@ export default {
 					getUserInfo().then(res => {
 						console.log(res)
 						sessionStorage.setItem('userInfo', JSON.stringify(res.data.result))
+						if(rememberMe.value){
+							localStorage.setItem('token', res.data.result)
+						}
+						getUserName();
+						router.push('/')
+						location.reload()
 					})
-					if(rememberMe.value){
-						localStorage.setItem('token', res.data.result)
-					}
-					getUserName();
-					router.push('/')
-					location.reload()
 				} else {
 					ElMessage.error('登录失败： '+res.data.msg)
 					console.error('登录失败： ',res.data.msg)
@@ -129,6 +129,7 @@ export default {
 				}
 			}).catch(err => {
 				console.error(err)
+				ElMessage.error('登录失败，您可能没有互联网连接')
 			})
 		}
 

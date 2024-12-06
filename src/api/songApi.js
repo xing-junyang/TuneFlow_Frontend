@@ -25,7 +25,7 @@ export function createSongList(data) {
 // 获取用户歌单
 export function getUserSongList() {
     return request({
-        url: '/api/songlists/getSonglist',
+        url: '/api/songlists/getUserSonglists',
         method: 'get'
     })
 }

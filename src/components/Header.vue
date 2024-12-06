@@ -396,11 +396,11 @@ export default {
       return (sessionStorage.getItem('token') != null || localStorage.getItem('token') != null)
     })
 
-    const isAdmin = computed(() => {
-      const userInfo = JSON.parse(sessionStorage.getItem('userInfo'))
-      console.log(userInfo.role);
-      return userInfo && userInfo.role === 'Admin'
-    })
+		const isAdmin = computed(() => {
+			const userInfo = JSON.parse(sessionStorage.getItem('userInfo'))
+			// console.log(userInfo.role);
+			return userInfo && userInfo.role === 'Admin'
+		})
 
     const isChatOpen = ref(false); // 控制对话框的显示与隐藏
 

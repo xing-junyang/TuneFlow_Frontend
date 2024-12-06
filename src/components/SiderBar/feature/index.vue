@@ -185,7 +185,7 @@ const handleCreatePlaylist = () => {
         name: "新歌曲",
         artist: "未知艺术家",
         description: "新添加的歌曲",
-        mark: "未分类",
+        mark: "4.8",
         path: ""
     }
     addSong(newSong)

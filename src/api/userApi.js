@@ -22,7 +22,7 @@ export function getUserInfo() {
         url: '/api/users/getInformation',
         headers: {
             'Content-Type': 'application/json',
-            'Token': sessionStorage.getItem('token') == null? localStorage.getItem('token'): sessionStorage.getItem('token')
+            'token': sessionStorage.getItem('token') == null? localStorage.getItem('token'): sessionStorage.getItem('token')
         }
     };
 

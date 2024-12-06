@@ -1,9 +1,9 @@
-import { reactive } from 'vue'
-import { SORT_TYPES } from '@/constants/sort'
+import {reactive} from 'vue'
+import {SORT_TYPES} from '@/constants/sort'
 import dayjs from 'dayjs'
-import { 
-    createSongList, 
-    getUserSongList, 
+import {
+    createSongList,
+    getUserSongList,
     searchSongList as searchSongListApi,
     deleteSongList,
     updateSongList
@@ -21,11 +21,18 @@ export const songListStore = reactive({
 // 获取用户的歌曲列表
 export async function getUserSongs() {
     try {
-        const res = await getUserSongList()
-        if (res.code === '200') {
-            songListStore.userSongList = res.result
-        }
-        return songListStore.userSongList
+        await getUserSongList().then(res => {
+                console.log('获取用户歌单成功:', res)
+                if (res.code === '000') {
+                    songListStore.userSongList = res.result
+                }
+                console.log('获取用户歌单成功:', songListStore.userSongList)
+                return songListStore.userSongList
+            }
+        ).catch(error => {
+            console.error('获取用户歌单失败(Promise):', error)
+        })
+
     } catch (error) {
         console.error('获取用户歌单失败:', error)
         songListStore.userSongList = [
@@ -77,7 +84,7 @@ export async function searchSongList(keyword) {
         songListStore.searchResults = []
         return songListStore.searchResults
     }
-    
+
     try {
         const res = await searchSongListApi(keyword)
         if (res.code === '200') {
