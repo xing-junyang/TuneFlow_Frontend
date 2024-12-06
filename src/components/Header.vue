@@ -86,7 +86,7 @@ export default {
 
 		const isAdmin = computed(() => {
 			const userInfo = JSON.parse(sessionStorage.getItem('userInfo'))
-			console.log(userInfo.role);
+			// console.log(userInfo.role);
 			return userInfo && userInfo.role === 'Admin'
 		})
 

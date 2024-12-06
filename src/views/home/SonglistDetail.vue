@@ -97,6 +97,8 @@ const addToPlayList = (index) => {
 
 onMounted(() => {
 	console.log('Song list detail view mounted');
+	//getAlbumInfo();
+	//getSongs();
 	getAllSongsAudioDuration()
 });
 </script>

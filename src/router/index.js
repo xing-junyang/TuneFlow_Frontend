@@ -8,12 +8,14 @@ import {hasLogin} from '@/utils/index.js';
 import FeatureView from "@/views/home/FeatureView.vue";
 import SonglistDetail from "@/views/home/SonglistDetail.vue";
 import UploadSongList from "@/views/upload/UploadSonglist.vue";
+import NotLogin from "@/views/home/NotLogin.vue";
 
 const routes = [
     {
         path: '/', component: HomeView, redirect: '/feature', children: [
             {path: '/feature', component: FeatureView},
             {path: '/song_list_detail/:song_list_id', name: 'SonglistDetail', component: SonglistDetail},
+            {path: '/not_login', component: NotLogin}
         ]
     },
     {path: '/playlist', component: PlaylistView},
@@ -31,6 +33,8 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
     if ((to.path === '/login' || to.path === '/register') && hasLogin()) {
         next('/');
+    } else if((to.path !== '/login' && to.path !== '/register' && to.path !== '/not_login') && !hasLogin()) {
+        next('/not_login');
     } else {
         next();
     }

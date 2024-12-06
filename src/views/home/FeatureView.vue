@@ -1,5 +1,5 @@
 <script setup>
-import { ref} from 'vue';
+import {onMounted, ref} from 'vue';
 import router from "@/router";
 
 // 模拟专辑数据
@@ -125,6 +125,11 @@ const navigateToAlbum = (albumId) => {
 	//Navigate to the album detail page
 	router.push({ name: 'SonglistDetail', params: { song_list_id: albumId } });
 };
+
+onMounted(() => {
+	// 在这里执行初始化逻辑
+	console.log('FeatureView mounted');
+});
 </script>
 
 <template>
