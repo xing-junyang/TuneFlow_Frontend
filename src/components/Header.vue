@@ -8,6 +8,12 @@
 		</div>
 
 		<div class="header-right">
+			<button v-if="hasLogin && isAdmin" class="btn btn-login" @click="handleUploadSongList">
+                <span class="btn-content">
+                    <span class="material-icons">music_note</span>
+                    <span>上传音乐</span>
+                </span>
+			</button>
 			<button v-if="!hasLogin" class="btn btn-login" @click="handleLogin">
                 <span class="btn-content">
                     <span class="material-icons">login</span>
@@ -50,6 +56,10 @@ export default {
 			this.$emit('register')
 			this.$router.push('/register')
 		},
+		handleUploadSongList() {
+			this.$emit('upload_song_list')
+			this.$router.push('/upload_song_list')
+		},
 		handleHome() {
 			this.$emit('home')
 			this.$router.push('/')
@@ -74,9 +84,16 @@ export default {
 			return (sessionStorage.getItem('token') != null || localStorage.getItem('token') != null)
 		})
 
+		const isAdmin = computed(() => {
+			const userInfo = JSON.parse(sessionStorage.getItem('userInfo'))
+			console.log(userInfo.role);
+			return userInfo && userInfo.role === 'Admin'
+		})
+
 		return {
 			userName,
-			hasLogin
+			hasLogin,
+			isAdmin
 		}
 	},
 	beforeRouteEnter() {

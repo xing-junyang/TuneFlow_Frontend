@@ -76,7 +76,7 @@
 
 <script>
 import {ref, computed} from 'vue'
-import {login} from "@/api/userApi";
+import {getUserInfo, login} from "@/api/userApi";
 import {getUserName} from "@/utils";
 import router from "@/router";
 import {ElMessage} from "element-plus";
@@ -112,6 +112,10 @@ export default {
 					console.log('登录成功')
 					ElMessage.success('登录成功')
 					sessionStorage.setItem('token', res.data.result)
+					getUserInfo().then(res => {
+						console.log(res)
+						sessionStorage.setItem('userInfo', JSON.stringify(res.data.result))
+					})
 					if(rememberMe.value){
 						localStorage.setItem('token', res.data.result)
 					}

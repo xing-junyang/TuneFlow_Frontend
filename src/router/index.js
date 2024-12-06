@@ -7,18 +7,20 @@ import RegisterView from "@/views/user/Register.vue";
 import {hasLogin} from '@/utils/index.js';
 import FeatureView from "@/views/home/FeatureView.vue";
 import SonglistDetail from "@/views/home/SonglistDetail.vue";
+import UploadSongList from "@/views/upload/UploadSonglist.vue";
 
 const routes = [
     {
         path: '/', component: HomeView, redirect: '/feature', children: [
             {path: '/feature', component: FeatureView},
-            {path: '/song_list_detail/:song_list_id', name: 'SonglistDetail', component: SonglistDetail}
+            {path: '/song_list_detail/:song_list_id', name: 'SonglistDetail', component: SonglistDetail},
         ]
     },
     {path: '/playlist', component: PlaylistView},
     {path: '/song', component: SongView},
     {path: '/login', component: LoginView},
-    {path: '/register', component: RegisterView}
+    {path: '/register', component: RegisterView},
+    {path: '/upload_song_list', component: UploadSongList},
 ];
 
 const router = createRouter({

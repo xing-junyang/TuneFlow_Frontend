@@ -22,11 +22,11 @@ import Sidebar from "@/components/SiderBar/feature/index.vue"
 const route = useRoute()
 
 const showPlayer = computed(() => {
-	return !['login', 'register'].includes(route.path.slice(1))
+	return !['login', 'register','upload_song_list'].includes(route.path.slice(1))
 })
 
 const showSideBar = computed(() => {
-	return !['login', 'register'].includes(route.path.slice(1))
+	return !['login', 'register','upload_song_list'].includes(route.path.slice(1))
 })
 </script>
 
