@@ -129,6 +129,7 @@ export default {
 				}
 			}).catch(err => {
 				console.error(err)
+				ElMessage.error('登录失败，您可能没有互联网连接')
 			})
 		}
 

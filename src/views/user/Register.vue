@@ -211,6 +211,7 @@ export default {
 				})
 				.catch(error => {
 					console.error(error)
+					ElMessage.error('注册失败，您可能没有互联网连接')
 				})
 		}
 

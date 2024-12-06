@@ -110,7 +110,8 @@ onMounted(async () => {
 		}
 		albumInfo.value = res.data.result;
 	}).catch(err => {
-		ElMessage.error('获取专辑信息失败：'+err);
+		console.log(err)
+		ElMessage.error('获取专辑信息失败，您可能没有互联网连接');
 		return -1;
 	});
 	if(sig === -1){
@@ -121,7 +122,8 @@ onMounted(async () => {
 			console.log(res);
 			songs.value.push(res.data.result);
 		}).catch(err => {
-			ElMessage.error('获取歌曲信息失败：'+err);
+			console.log(err)
+			ElMessage.error('获取歌曲信息失败，您可能没有互联网连接');
 		});
 	}
 	await getAllSongsAudioDuration()
