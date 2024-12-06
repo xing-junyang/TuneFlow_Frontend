@@ -53,6 +53,23 @@ const formatDuration = (seconds) => {
 	return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
 };
 
+const getAudioDuration = async (url) => {
+	const audio = new Audio(url);
+	// get audio duration by url, the url should be a valid audio file
+	return new Promise((resolve) => {
+		audio.addEventListener('loadedmetadata', () => {
+			console.log('Audio duration:', audio.duration);
+			resolve(formatDuration(Math.round(audio.duration)));
+		});
+	});
+};
+
+const getAllSongsAudioDuration = async () => {
+	for (let i = 0; i < songs.value.length; i++) {
+		songs.value[i].duration = await getAudioDuration(songs.value[i].audioUrl);
+	}
+};
+
 const playSong = (index) => {
 	console.log('Playing song:', index);
 	let songsToPlay = [];
@@ -80,6 +97,7 @@ const addToPlayList = (index) => {
 
 onMounted(() => {
 	console.log('Song list detail view mounted');
+	getAllSongsAudioDuration()
 });
 </script>
 
@@ -137,7 +155,8 @@ onMounted(() => {
 					</td>
 					<td @click="playSong(index)">{{ song.artist }}</td>
 					<td @click="playSong(index)">{{ song.genre }}</td>
-					<td @click="playSong(index)">{{ formatDuration(180) }}</td> <!-- 示例固定时长 -->
+					<!-- 根据音频 URL获取时长 -->
+					<td @click="playSong(index)">{{song.duration}}</td>
 				</tr>
 				</tbody>
 			</table>
