@@ -32,7 +32,7 @@
             <SidebarGroup :title="isExpanded ? '播放列表' : ''">
                 <SidebarMenu>
                     <SidebarMenuItem :rightMenuOptions="getRightMenuOptions(playlist)"
-                        v-for="(playlist, index) in playlists" :key="playlist.id" :index="index"
+                        v-for="(playlist, index) in songList" :key="playlist.id" :index="index"
                         :collapsed="!isExpanded" @click="handlePlay(playlist)">
                         <template #expanded>
                             <PlaylistItemExpanded :playlist="playlist" @play="handlePlay" />
@@ -55,10 +55,53 @@
             </button>
         </SidebarFooter>
     </SidebarRoot>
+
+    <!-- 添加编辑对话框 -->
+    <el-dialog
+        v-model="dialogVisible"
+        title="编辑歌单"
+        width="30%"
+        :before-close="handleClose"
+    >
+        <el-form
+            ref="formRef"
+            :model="editForm"
+            :rules="rules"
+            label-width="80px"
+        >
+            <el-form-item label="歌单名称" prop="name">
+                <el-input 
+                    v-model="editForm.name" 
+                    placeholder="请输入歌单名称"
+                    maxlength="50"
+                    show-word-limit
+                />
+            </el-form-item>
+            
+            <el-form-item label="描述" prop="description">
+                <el-input
+                    v-model="editForm.description"
+                    type="textarea"
+                    :rows="3"
+                    placeholder="请输入歌单描述"
+                    maxlength="200"
+                    show-word-limit
+                />
+            </el-form-item>
+        </el-form>
+        
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="dialogVisible = false">取消</el-button>
+                <el-button type="primary" @click="handleSubmit">确认</el-button>
+            </span>
+        </template>
+    </el-dialog>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, reactive } from 'vue'
+import { ElMessage } from 'element-plus'
 import {
     SidebarRoot,
     SidebarHeader,
@@ -78,10 +121,7 @@ import PlaylistItemCollapsed from './components/PlaylistItemCollapsed.vue'
 import FilterToolbar from './components/FilterToolbar.vue'
 import LibraryIcon from './components/LibraryIcon.vue'
 import { userSongList } from '@/hooks/useSongs'
-import {
-  playSongFromPlaylist,
-} from '@/global/playlist';
-
+import { setPlaylistSongs } from '@/global/playlist'
 const { songs, addSong, updateSongList, deleteSongList } = userSongList()
 
 defineProps({
@@ -97,17 +137,14 @@ const getRightMenuOptions = (playlist) => {
             {
                 label: '编辑',
                 icon: 'fas fa-edit',
-                onClick: () => {
-                    console.log('编辑', playlist)
-                    updateSongList(playlist)
-                }
+                onClick: () => handleEdit(playlist)
             },
             {
                 label: '删除',
                 icon: 'fas fa-trash',
                 onClick: () => {
                     console.log('删除', playlist)
-                    deleteSongList(playlist)
+                    deleteSongList(playlist.id)
                 }
             }
         ],
@@ -120,7 +157,7 @@ const { width, updateWidth, isExpanded, toggleSidebar } = useSidebar()
 const showLeftIcon = computed(() => {
     return SIDEBAR_MIN_WIDTH >= width.value
 })
-const playlists = computed(() => {
+const songList = computed(() => {
     return songs.value.map(song => ({
         id: song.id.toString(),
         name: song.name,
@@ -138,10 +175,9 @@ const playlists = computed(() => {
 })
 
 const handlePlay = (playlist) => {
-    const song = songs.value.find(s => s.id.toString() === playlist.id);
-    playSongFromPlaylist();
-    console.log(song);
-
+    const song = songs.value.find(s => s.id.toString() === playlist.id)
+    console.log(song)
+    setPlaylistSongs(song)
 }
 
 const handleCreatePlaylist = () => {
@@ -153,6 +189,76 @@ const handleCreatePlaylist = () => {
         path: ""
     }
     addSong(newSong)
+}
+
+// 表单ref
+const formRef = ref(null)
+
+// 对话框可见性
+const dialogVisible = ref(false)
+
+// 编辑表单数据
+const editForm = reactive({
+    id: '',
+    name: '',
+    description: '',
+    userId: '',
+    songsId: '',
+    createTime: ''
+})
+
+// 表单验证规则
+const rules = {
+    name: [
+        { required: true, message: '请输入歌单名称', trigger: 'blur' },
+        { min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur' }
+    ],
+    description: [
+        { max: 200, message: '描述不能超过200个字符', trigger: 'blur' }
+    ]
+}
+
+// 处理关闭对话框
+const handleClose = (done) => {
+    formRef.value?.resetFields()
+    done()
+}
+
+// 打开编辑对话框
+const handleEdit = (playlist) => {
+    Object.assign(editForm, {
+        id: playlist.id,
+        name: playlist.name,
+        description: playlist.description,
+        userId: playlist.userId,
+        songsId: playlist.songsId,
+        createTime: playlist.createTime
+    })
+    dialogVisible.value = true
+}
+
+// 处理表单提交
+const handleSubmit = async () => {
+    if (!formRef.value) return
+    
+    await formRef.value.validate(async (valid) => {
+        if (valid) {
+            try {
+                const res = await updateSongList(editForm)
+                if (res.code === '200') {
+                    ElMessage.success('更新成功')
+                    dialogVisible.value = false
+                    // 刷新列表
+                    // await getUserSongs()
+                } else {
+                    ElMessage.error(res.msg || '更新失败')
+                }
+            } catch (error) {
+                console.error('更新歌单失败:', error)
+                ElMessage.error('更新失败')
+            }
+        }
+    })
 }
 </script>
 
@@ -308,6 +414,54 @@ const handleCreatePlaylist = () => {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+}
+
+.dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+:deep(.el-dialog) {
+    border-radius: 8px;
+    background-color: var(--color-background);
+    color: var(--color-text);
+    
+    .el-dialog__header {
+        margin-bottom: 20px;
+        padding: 20px;
+        border-bottom: 1px solid var(--color-border);
+        
+        .el-dialog__title {
+            color: var(--color-text);
+        }
+    }
+    
+    .el-dialog__body {
+        padding: 0 20px;
+    }
+    
+    .el-dialog__footer {
+        padding: 20px;
+        border-top: 1px solid var(--color-border);
+    }
+
+    .el-input__wrapper {
+        background-color: var(--color-background-light);
+    }
+
+    .el-input__inner {
+        color: var(--color-text);
+    }
+
+    .el-textarea__inner {
+        background-color: var(--color-background-light);
+        color: var(--color-text);
+    }
+
+    .el-form-item__label {
+        color: var(--color-text);
     }
 }
 </style>

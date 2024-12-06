@@ -34,7 +34,7 @@ export async function getUserSongs() {
                 name: "夜曲",
                 artist: "周杰伦",
                 path: "/songs/1.mp3",
-                mark: "流行",
+                mark: "1.0",
                 description: "《夜曲》是周杰伦演唱的歌曲",
                 createTime: "2024-03-20"
             },
