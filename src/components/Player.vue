@@ -532,6 +532,8 @@ export default {
 	beforeUnmount() {
 		window.removeEventListener('mousemove', this.handleVolumeChange)
 		window.removeEventListener('mouseup', this.stopVolumeChange)
+		window.removeEventListener('mousemove', this.handleProgressChange)
+		window.removeEventListener('mouseup', this.stopProgressChange)
 		window.removeEventListener("resize", this.checkScreenWidth);
 	}
 }
