@@ -51,7 +51,7 @@
 
 			<div class="progress-bar">
 				<div class="time">{{ formatTime(currentTime) }}</div>
-				<div class="progress-wrapper" @click="seek">
+				<div class="progress-wrapper" ref="progressSlider" @click="seek" @mousedown.prevent="startProgressChange">
 					<div class="progress-bg"></div>
 					<div class="progress-current" :style="{ width: progress + '%' }"></div>
 					<div class="progress-handle" :style="{ left: progress + '%' }"></div>
@@ -215,6 +215,7 @@ export default {
 			currentTime: 0,
 			duration: 0,
 			isDraggingVolume: false,
+			isDraggingProgress: false,
 			lastVolume: 100,
 			playMode: 'loop', // 'loop' | 'single' | 'random'
 			playlist,
@@ -402,10 +403,33 @@ export default {
 			this.$refs.audioRef.volume = this.volume / 100
 		},
 
+		startProgressChange(e) {
+			this.isDraggingProgress = true
+			this.seek(e)
+			window.addEventListener('mousemove', this.handleProgressChange)
+			window.addEventListener('mouseup', this.stopProgressChange)
+		},
+
+		handleProgressChange(e) {
+			if (this.isDraggingProgress) {
+				e.preventDefault()
+				this.seek(e)
+			}
+		},
+
+		stopProgressChange() {
+			if (this.isDraggingProgress) {
+				this.isDraggingProgress = false
+				window.removeEventListener('mousemove', this.handleProgressChange)
+				window.removeEventListener('mouseup', this.stopProgressChange)
+			}
+		},
+
 		seek(e) {
-			const rect = e.target.getBoundingClientRect()
+			const progressSlider = this.$refs.progressSlider
+			const rect = progressSlider.getBoundingClientRect()
 			const x = e.clientX - rect.left
-			const percentage = x / rect.width
+			const percentage = Math.min(x / rect.width, 0.999); //防止闪烁
 			const newTime = this.duration * percentage
 			this.currentTime = newTime
 			this.$refs.audioRef.currentTime = newTime
@@ -508,6 +532,8 @@ export default {
 	beforeUnmount() {
 		window.removeEventListener('mousemove', this.handleVolumeChange)
 		window.removeEventListener('mouseup', this.stopVolumeChange)
+		window.removeEventListener('mousemove', this.handleProgressChange)
+		window.removeEventListener('mouseup', this.stopProgressChange)
 		window.removeEventListener("resize", this.checkScreenWidth);
 	}
 }
