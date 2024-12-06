@@ -2,6 +2,8 @@
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import {setPlaylistSongs, playSongFromPlaylist, playlist, addSong} from "@/global/playlist";
+import {getAlbum, getAlbumSongs} from "@/api/songlistApi";
+import {ElMessage} from "element-plus";
 
 const route = useRoute();
 const songListId = route.params.song_list_id;
@@ -95,11 +97,34 @@ const addToPlayList = (index) => {
 	addSong(songs.value[index]);
 };
 
-onMounted(() => {
+onMounted(async () => {
 	console.log('Song list detail view mounted');
-	//getAlbumInfo();
 	//getSongs();
-	getAllSongsAudioDuration()
+	songs.value = [];
+	const songlistId = route.params.song_list_id;
+	console.log('Song list id:', songlistId);
+	const sig = await getAlbum(Number(songlistId)).then(res => {
+		console.log('Album res:',res);
+		if(res === undefined){
+			return -1;
+		}
+		albumInfo.value = res.data.result;
+	}).catch(err => {
+		ElMessage.error('获取专辑信息失败：'+err);
+		return -1;
+	});
+	if(sig === -1){
+		return;
+	}
+	for (let i = 0; i < albumInfo.value.songsId.length; i++) {
+		await getAlbumSongs(Number(albumInfo.value.songsId[i])).then(res => {
+			console.log(res);
+			songs.value.push(res.data.result);
+		}).catch(err => {
+			ElMessage.error('获取歌曲信息失败：'+err);
+		});
+	}
+	await getAllSongsAudioDuration()
 });
 </script>
 

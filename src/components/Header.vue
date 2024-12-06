@@ -68,7 +68,10 @@ export default {
 			this.$emit('logout')
 			sessionStorage.removeItem('token')
 			sessionStorage.removeItem('userName')
+			sessionStorage.removeItem('userInfo')
 			localStorage.removeItem('token')
+			localStorage.removeItem('userName')
+			localStorage.removeItem('userInfo')
 			router.push('/')
 			//reload
 			location.reload()

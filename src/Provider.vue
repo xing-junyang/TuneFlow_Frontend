@@ -16,5 +16,6 @@ import {
 // 初始化用户状态
 initUserStore()
 // 初始化歌单列表2
+
 getUserSongs()
 </script>

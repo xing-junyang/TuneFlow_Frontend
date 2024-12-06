@@ -1,6 +1,8 @@
 <script setup>
 import {onMounted, ref} from 'vue';
 import router from "@/router";
+import {getAlbums} from "@/api/songlistApi";
+import {ElMessage} from "element-plus";
 
 // 模拟专辑数据
 const albums = ref([
@@ -129,6 +131,13 @@ const navigateToAlbum = (albumId) => {
 onMounted(() => {
 	// 在这里执行初始化逻辑
 	console.log('FeatureView mounted');
+	getAlbums().then((res) => {
+		console.log('Albums:', res.data.result);
+		albums.value = res.data.result;
+	}).catch((err) => {
+		console.error('Failed to get albums:', err);
+		ElMessage.error('获取推荐专辑失败，您可能没有互联网连接');
+	});
 });
 </script>
 
