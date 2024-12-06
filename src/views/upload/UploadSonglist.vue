@@ -17,7 +17,7 @@
 						<span class="material-icons">music_note</span>
 						名称
 					</label>
-					<input type="text" v-model="songListName" required :class="{ 'has-value': phone }" placeholder="请输入歌单名称">
+					<input type="text" v-model="songListName" required :class="{ 'has-value': songListName }" placeholder="请输入歌单名称">
 					<!--					<span class="password-match" v-if="phone&&!isPhoneValid" :class="{ error: !isPhoneValid }">手机号无效</span>-->
 				</div>
 
@@ -26,7 +26,18 @@
 						<span class="material-icons">music_note</span>
 						专辑封面 URL
 					</label>
-					<input type="text" v-model="songListPictureUrl" required :class="{ 'has-value': phone }" placeholder="请输入 URL">
+					<el-upload
+						class="avatar-uploader"
+						action="http://113.44.139.10:8080/api/tools/upload"
+						:headers="uploadHeaders"
+						:show-file-list="false"
+						:on-success="handleSongListPictureSuccess"
+						:on-error="handleUploadError"
+						:before-upload="beforePictureUpload"
+					>
+						<img v-if="songListPictureUrl" :src="songListPictureUrl" class="avatar" />
+						<div v-else class="avatar-uploader-icon material-icons">cloud_upload</div>
+					</el-upload>
 					<!--					<span class="password-match" v-if="phone&&!isPhoneValid" :class="{ error: !isPhoneValid }">手机号无效</span>-->
 				</div>
 
@@ -35,7 +46,7 @@
 						<span class="material-icons">music_note</span>
 						描述
 					</label>
-					<input type="text" v-model="songListDescription" required :class="{ 'has-value': phone }" placeholder="请输入歌单描述">
+					<input type="text" v-model="songListDescription" required :class="{ 'has-value': songListDescription }" placeholder="请输入歌单描述">
 					<!--					<span class="password-match" v-if="phone&&!isPhoneValid" :class="{ error: !isPhoneValid }">手机号无效</span>-->
 				</div>
 
@@ -60,7 +71,7 @@
 						<span class="material-icons">music_note</span>
 						名称
 					</label>
-					<input type="text" v-model="songName" required :class="{ 'has-value': phone }" placeholder="请输入歌曲名称">
+					<input type="text" v-model="songName" required :class="{ 'has-value': songName }" placeholder="请输入歌曲名称">
 <!--					<span class="password-match" v-if="phone&&!isPhoneValid" :class="{ error: !isPhoneValid }">手机号无效</span>-->
 				</div>
 
@@ -69,7 +80,7 @@
 						<span class="material-icons">nightlife</span>
 						流派
 					</label>
-					<input type="text" v-model="songGenre" required :class="{ 'has-value': phone }" placeholder="请输入歌曲流派">
+					<input type="text" v-model="songGenre" required :class="{ 'has-value': songGenre }" placeholder="请输入歌曲流派">
 					<!--					<span class="password-match" v-if="phone&&!isPhoneValid" :class="{ error: !isPhoneValid }">手机号无效</span>-->
 				</div>
 
@@ -78,35 +89,80 @@
 						<span class="material-icons">interpreter_mode</span>
 						演唱者
 					</label>
-					<input type="text" v-model="songArtist" required :class="{ 'has-value': phone }" placeholder="请输入歌曲演唱者">
+					<input type="text" v-model="songArtist" required :class="{ 'has-value': songArtist }" placeholder="请输入歌曲演唱者">
 					<!--					<span class="password-match" v-if="phone&&!isPhoneValid" :class="{ error: !isPhoneValid }">手机号无效</span>-->
 				</div>
 
-				<div class="form-group">
-					<label>
-						<span class="material-icons">graphic_eq</span>
-						音频 URL
-					</label>
-					<input type="text" v-model="songAudioUrl" required :class="{ 'has-value': phone }" placeholder="请输入 URL">
-					<span class="password-match" v-if="songAudioUrl&&(!isSongAudioUrlValid)" :class="{ error: !isSongAudioUrlValid }">URL 无效</span>
-				</div>
+				<div class="song-upload-group">
+					<div class="form-group">
+						<label>
+							<span class="material-icons">album</span>
+							专辑封面 URL
+						</label>
+						<el-upload
+							ref="uploadSongPicture"
+							class="avatar-uploader"
+							action="http://113.44.139.10:8080/api/tools/upload"
+							:headers="uploadHeaders"
+							:show-file-list="false"
+							:on-success="handleSongPictureSuccess"
+							:on-error="handleUploadError"
+							:before-upload="beforePictureUpload"
+						>
+							<img v-if="songPictureUrl" :src="songPictureUrl" class="avatar" />
+							<div v-else class="avatar-uploader-icon material-icons">cloud_upload</div>
+						</el-upload>
+						<!--					<input type="text" v-model="songPictureUrl" required :class="{ 'has-value': songPictureUrl }" placeholder="请输入 URL">-->
+						<!--					<span class="password-match" v-if="songPictureUrl&&(!isSongPictureUrlValid)" :class="{ error: !isSongPictureUrlValid }">URL 无效</span>-->
+					</div>
 
-				<div class="form-group">
-					<label>
-						<span class="material-icons">album</span>
-						专辑封面 URL
-					</label>
-					<input type="text" v-model="songPictureUrl" required :class="{ 'has-value': songPictureUrl }" placeholder="请输入 URL">
-					<span class="password-match" v-if="songPictureUrl&&(!isSongPictureUrlValid)" :class="{ error: !isSongPictureUrlValid }">URL 无效</span>
-				</div>
+					<div class="audio-and-lyric-upload">
+						<div class="form-group" >
+							<label>
+								<span class="material-icons">graphic_eq</span>
+								音频 URL
+							</label>
+							<el-upload
+								ref="uploadAudio"
+								class="upload-demo"
+								action="http://113.44.139.10:8080/api/tools/upload"
+								:headers="uploadHeaders"
 
-				<div class="form-group">
-					<label>
-						<span class="material-icons">lyrics</span>
-						歌词 URL
-					</label>
-					<input type="text" v-model="songLyricUrl" required :class="{ 'has-value': phone }" placeholder="请输入 URL">
-					<span class="password-match" v-if="songLyricUrl&&(!isSongLyricUrlValid)" :class="{ error: !isSongLyricUrlValid }">URL 无效</span>
+								:on-success="handleSongAudioSuccess"
+								:on-error="handleUploadError"
+								:before-upload="beforeUpload"
+							>
+								<template #trigger>
+									<button class="submit-btn">点击上传</button>
+								</template>
+							</el-upload>
+							<!--					<input type="text" v-model="songAudioUrl" required :class="{ 'has-value': phone }" placeholder="请输入 URL">-->
+							<!--					<span class="password-match" v-if="songAudioUrl&&(!isSongAudioUrlValid)" :class="{ error: !isSongAudioUrlValid }">URL 无效</span>-->
+						</div>
+
+						<div class="form-group" >
+							<label>
+								<span class="material-icons">lyrics</span>
+								歌词 URL
+							</label>
+							<el-upload
+								ref="uploadLyric"
+								class="upload-demo"
+								action="http://113.44.139.10:8080/api/tools/upload"
+								:headers="uploadHeaders"
+
+								:on-success="handleSongLyricSuccess"
+								:on-error="handleUploadError"
+								:before-upload="beforeUpload"
+							>
+								<template #trigger>
+									<button class="submit-btn">点击上传</button>
+								</template>
+							</el-upload>
+							<!--					<input type="text" v-model="songLyricUrl" required :class="{ 'has-value': phone }" placeholder="请输入 URL">-->
+							<!--					<span class="password-match" v-if="songLyricUrl&&(!isSongLyricUrlValid)" :class="{ error: !isSongLyricUrlValid }">URL 无效</span>-->
+						</div>
+					</div>
 				</div>
 
 				<button type="submit" class="submit-btn" :disabled="!isUploadSongFormValid">
@@ -120,23 +176,11 @@
 
 <script>
 import {ref, computed} from 'vue'
+import {ElMessage} from 'element-plus'
 
 export default {
 	name: 'uploadView',
 	setup() {
-		const phone = ref(sessionStorage.getItem('phone') || '')
-		const password = ref('')
-		const rememberMe = ref(false)
-		const showPassword = ref(false)
-
-		const isFormValid = computed(() => {
-			return phone.value && password.value
-		})
-
-		const isPhoneValid = computed(() => {
-			return /^1[3456789]\d{9}$/.test(phone.value)
-		})
-
 		//song list
 		const songListName = ref('')
 		const songListDescription = ref('')
@@ -151,6 +195,33 @@ export default {
 		const songPictureUrl = ref('')
 		const songLyricUrl = ref('')
 		const songDescription = ref('')
+
+		//upload
+		const uploadHeaders = {
+			Authorization: 'Bearer ' + sessionStorage.getItem('token'),
+			token: sessionStorage.getItem('token')
+		}
+		const uploadAudio = ref(null)
+		const uploadLyric = ref(null)
+		const uploadSongPicture = ref(null)
+
+		//upload songlist
+
+		/*
+		Format:
+		[
+		{
+			songName: string,
+			songGenre: string,
+			songArtist: string,
+			songAudioFile: UploadInstance,
+			songPictureFile: UploadInstance,
+			songLyricFile: UploadInstance,
+			songDescription: string
+		}
+		]
+		 */
+		const uploadSongs = ref([])
 
 		// URL checker
 		const isSongPictureUrlValid = computed(() => {
@@ -170,38 +241,78 @@ export default {
 		})
 
 		const isUploadSongFormValid = computed(() => {
-			return songName.value && songGenre.value && songArtist.value && songAudioUrl.value && songPictureUrl.value && songLyricUrl.value && isSongPictureUrlValid && isSongAudioUrlValid && isSongLyricUrlValid
+			return songName.value && songGenre.value && songArtist.value && songAudioUrl.value && songPictureUrl.value && isSongPictureUrlValid && isSongAudioUrlValid
 		})
+
+		const handleSongPictureSuccess = (response, uploadFile) => {
+			// 将上传的文件生成临时 URL，并绑定到 imageUrl
+			ElMessage.success('上传成功');
+			songPictureUrl.value = URL.createObjectURL(uploadFile.raw);
+		};
+
+		const handleSongListPictureSuccess = (response, uploadFile) => {
+			// 将上传的文件生成临时 URL，并绑定到 imageUrl
+			ElMessage.success('上传成功');
+			songListPictureUrl.value = URL.createObjectURL(uploadFile.raw);
+			console.log(songListPictureUrl.value)
+		};
+
+		const handleSongAudioSuccess = (response, uploadFile) => {
+			// 将上传的文件生成临时 URL，并绑定到 imageUrl
+			ElMessage.success('上传成功');
+			songAudioUrl.value = URL.createObjectURL(uploadFile.raw);
+		};
+
+		const handleSongLyricSuccess = (response, uploadFile) => {
+			// 将上传的文件生成临时 URL，并绑定到 imageUrl
+			ElMessage.success('上传成功');
+			songLyricUrl.value = URL.createObjectURL(uploadFile.raw);
+		};
+
+		const handleUploadError = (err) => {
+			ElMessage.error('上传失败，请检查网络连接');
+			console.log(err);
+		};
+
+		const beforeUpload = (rawFile) => {
+			// 判断文件大小是否超过 2MB
+			if (rawFile.size / 1024 / 1024 > 50) {
+				ElMessage.error('文件大小不能超过 50MB');
+				return false;
+			}
+			return true;
+		};
+
+		const beforePictureUpload = (rawFile) => {
+			// 判断文件格式是否为 JPEG
+			if (rawFile.type !== 'image/jpeg') {
+				ElMessage.error('专辑图片应该是 JPEG 格式');
+				return false;
+			}
+			// 判断文件大小是否超过 2MB
+			if (rawFile.size / 1024 / 1024 > 2) {
+				ElMessage.error('专辑图片大小不能超过 2MB');
+				return false;
+			}
+			return true;
+		};
+
 
 		const handleUploadSongList = () => {
 			// 处理上传逻辑
-			console.log({
-				phone: phone.value,
-				password: password.value,
-				rememberMe: rememberMe.value
-			})
+
 
 			// Upload songlist
 		}
 
 		const handleUploadSong = () => {
 			// 处理上传逻辑
-			console.log({
-				phone: phone.value,
-				password: password.value,
-				rememberMe: rememberMe.value
-			})
+
 
 			// Upload songlist
 		}
 
 		return {
-			phone,
-			password,
-			rememberMe,
-			showPassword,
-			isFormValid,
-			isPhoneValid,
 			songName,
 			songGenre,
 			songArtist,
@@ -218,6 +329,18 @@ export default {
 			isSongLyricUrlValid,
 			isUploadSongListFormValid,
 			isUploadSongFormValid,
+			uploadHeaders,
+			uploadLyric,
+			uploadAudio,
+			uploadSongPicture,
+			uploadSongs,
+			handleSongAudioSuccess,
+			handleSongPictureSuccess,
+			handleSongListPictureSuccess,
+			handleSongLyricSuccess,
+			beforeUpload,
+			beforePictureUpload,
+			handleUploadError,
 			handleUploadSong,
 			handleUploadSongList
 		}
@@ -291,6 +414,56 @@ export default {
 	color: #1db954;
 }
 
+.audio-and-lyric-upload{
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	width: 50%;
+}
+
+.song-upload-group{
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.avatar-uploader{
+
+	cursor: pointer;
+	position: relative;
+	overflow: hidden;
+	transition: var(--el-transition-duration-fast);
+	//width: fit-content;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.avatar-uploader:hover {
+	border-color: var(--color-primary);
+}
+
+.avatar-uploader-icon {
+	border: 2px solid rgba(255, 255, 255, 0.1);
+	background: rgba(255, 255, 255, 0.05);
+	margin-top: 20px;
+	border-radius: 12px;
+	font-size: 56px;
+	color: #c0c6d0;
+	width: 178px;
+	height: 178px;
+	line-height: 178px;
+	text-align: center;
+}
+
+.avatar{
+	width: 178px;
+	height: 178px;
+	border-radius: 12px;
+	object-fit: cover;
+	border: 2px solid var(--el-border-color);
+}
+
 input[type="tel"],
 input[type="password"],
 input[type="text"] {
@@ -315,39 +488,6 @@ input::placeholder {
 	color: rgba(255, 255, 255, 0.3);
 }
 
-.password-match {
-	display: block;
-	font-size: 0.8rem;
-	margin-top: 4px;
-	color: #1db954;
-	transition: color 0.3s ease;
-	font-weight: bold;
-}
-
-.password-match.error {
-	color: #ff4444;
-	font-weight: bold;
-}
-
-
-.password-input {
-	position: relative;
-}
-
-.password-toggle {
-	position: absolute;
-	right: 16px;
-	top: 50%;
-	transform: translateY(-50%);
-	color: rgba(255, 255, 255, 0.5);
-	cursor: pointer;
-	transition: color 0.3s ease;
-}
-
-.password-toggle:hover {
-	color: rgba(255, 255, 255, 0.8);
-}
-
 .checkbox-container input[type="checkbox"] {
 	position: absolute;
 	opacity: 0;
@@ -366,18 +506,6 @@ input::placeholder {
 
 .checkbox-container input:checked ~ .checkmark:after {
 	display: block;
-}
-
-.forgot-password {
-	color: #1db954;
-	text-decoration: none;
-	font-size: 0.9rem;
-	transition: color 0.3s ease;
-}
-
-.forgot-password:hover {
-	color: #1ed760;
-	text-decoration: underline;
 }
 
 .submit-btn {
@@ -416,23 +544,6 @@ input::placeholder {
 .social-btn img {
 	width: 20px;
 	height: 20px;
-}
-
-.register-link {
-	text-align: center;
-	margin-top: 20px;
-	color: rgba(255, 255, 255, 0.7);
-}
-
-.register-link a {
-	color: #1db954;
-	text-decoration: none;
-	font-weight: 600;
-	transition: color 0.3s ease;
-}
-
-.register-link a:hover {
-	color: #1ed760;
 }
 
 /* 错误状态样式 */
