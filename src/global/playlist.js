@@ -30,6 +30,11 @@ export function playSongFromPlaylist() {
     playlist.playing = true
 }
 
+export function playSongFromPlaylistByIndex(index) {
+    playlist.jumping = false
+    playlist.currentIndex = index
+    playlist.playing = true
+}
 
 export function addSong(song) {
     playlist.jumping = false
@@ -65,3 +70,4 @@ export function clearPlaylist() {
     playlist.currentIndex = 0
     playlist.playing = false
 }
+

@@ -197,7 +197,7 @@
 </template>
 
 <script>
-import {clearPlaylist, playlist} from "@/global/playlist";
+import {clearPlaylist, playlist, playSongFromPlaylistByIndex} from "@/global/playlist";
 
 export default {
 	name: 'PlayerBar',
@@ -290,11 +290,14 @@ export default {
 		playSong(index) {
 			// console.log(this);
 			this.currentSong = this.playlist.songs[index]
-			this.isPlaying = true
-			this.currentSongIndex = index
-			this.playlist.playing = true;
-			this.playlist.currentIndex = index;
+			// if(!this.isPlaying){
+			// 	this.$refs.audioRef.play()
+			// }
+			// this.isPlaying = true
 			this.$refs.audioRef.currentTime = 0
+			this.currentSongIndex = index
+			playSongFromPlaylistByIndex(index)
+			console.log("paused: ", this.$refs.audioRef.paused)
 		},
 
 		removeSong(index) {
@@ -460,7 +463,6 @@ export default {
 			this.isPlaying = true
 			this.playlist.playing = true
 			this.playlist.currentIndex = 0
-			this.playlist.playing = true
 		},
 
 		resetCurrentSong(){
@@ -502,10 +504,18 @@ export default {
 				if(!newSong||newSong.id===undefined||newSong.id===''){
 					return
 				}
-				if (newSong.audioUrl) {
+				if (newSong.audioUrl && newSong.audioUrl !== '') {
 					this.$nextTick(() => {
-						this.$refs.audioRef.play()
-						this.isPlaying = true
+						// if (this.$refs.audioRef.loaded){
+						// 	this.$refs.audioRef.load()
+						// }
+						// if (this.$refs.audioRef.paused){
+						this.$refs.audioRef.currentTime = 0
+						if(!this.isPlaying){
+							this.$refs.audioRef.play()
+							this.isPlaying = true
+						}
+						// }
 					})
 				}
 			},
