@@ -194,24 +194,8 @@ onMounted(async () => {
 			</table>
 		</div>
 		<div class="loading-container" v-else>
-<!--			&lt;!&ndash; 加载动画 &ndash;&gt;-->
-<!--			<div class="spinner"></div>-->
-<!--			<p class="loading-text">加载中，请稍候...</p>-->
-			<table>
-				<thead>
-				<tr>
-					<th></th>
-					<th>#</th>
-					<th>标题</th>
-					<th>艺术家</th>
-					<th>流派</th>
-					<th>时长</th>
-				</tr>
-				</thead>
-				<tbody>
-				</tbody>
-			</table>
-			<el-skeleton :rows="5" animated :loading="isLoading" style="width: 100%; padding-top: 40px;"></el-skeleton>
+			<div class="spinner"></div>
+			<p class="loading-text">加载数据中，请稍候...</p>
 		</div>
 	</div>
 </template>
@@ -373,7 +357,7 @@ td {
 	color: #555;
 }
 
-.loading-text{
+.loading-text {
 	margin-top: 16px;
 	font-size: 16px;
 	color: #666;

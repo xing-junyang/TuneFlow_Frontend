@@ -297,7 +297,7 @@ export default {
 			this.$refs.audioRef.currentTime = 0
 			this.currentSongIndex = index
 			playSongFromPlaylistByIndex(index)
-			console.log("paused: ", this.$refs.audioRef.paused)
+			// console.log("paused: ", this.$refs.audioRef.paused)
 		},
 
 		removeSong(index) {
@@ -506,16 +506,19 @@ export default {
 				}
 				if (newSong.audioUrl && newSong.audioUrl !== '') {
 					this.$nextTick(() => {
-						// if (this.$refs.audioRef.loaded){
-						// 	this.$refs.audioRef.load()
-						// }
-						// if (this.$refs.audioRef.paused){
-						this.$refs.audioRef.currentTime = 0
+						//Before playing the song, check if it is already playing.
 						if(!this.isPlaying){
+							this.$refs.audioRef.load()
+							this.$refs.audioRef.currentTime = 0
 							this.$refs.audioRef.play()
 							this.isPlaying = true
+						}else{
+							this.$refs.audioRef.pause()
+							this.$refs.audioRef.load()
+							this.$refs.audioRef.currentTime = 0
+							this.$refs.audioRef.play()
 						}
-						// }
+						//After this, the song should play.
 					})
 				}
 			},

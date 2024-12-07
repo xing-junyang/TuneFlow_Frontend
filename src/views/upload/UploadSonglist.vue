@@ -362,6 +362,8 @@ export default {
 			songArtist.value = ''
 			songPictureUrl.value = ''
 			songDescription.value = ''
+			songAudioUrl.value = ''
+			songLyricUrl.value = ''
 			uploadAudio.value.clearFiles()
 			uploadLyric.value.clearFiles()
 			uploadSongPicture.value.clearFiles()
