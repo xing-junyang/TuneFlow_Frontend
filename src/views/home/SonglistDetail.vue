@@ -4,51 +4,16 @@ import {useRoute} from 'vue-router';
 import {setPlaylistSongs, playSongFromPlaylist, playlist, addSong} from "@/global/playlist";
 import {getAlbum, getAlbumSongs} from "@/api/songlistApi";
 import {ElMessage} from "element-plus";
+import Loading from "@/components/Loading.vue";
 
 const route = useRoute();
-const songListId = route.params.song_list_id;
 const isLoading = ref(false);
 
 // Mock 专辑数据
-const albumInfo = ref({
-	id: songListId,
-	name: "午夜色彩",
-	userId: "user1",
-	songsId: "1,2,3,4",
-	mark: "4.8",
-	description: "深夜里的电子音乐精选，包含多首让人沉醉的电子音乐作品。从深邃的氛围到律动的节拍，带你进入声音的海洋。",
-	createTime: "2024-01-01T00:00:00+08:00",
-	type: "Album",
-	pictureUrl: "https://th.bing.com/th/id/R.d820b497cc152184d0f6620a9ec15714?rik=NdJJFHHnyGxSVg&riu=http%3a%2f%2fwallup.net%2fwp-content%2fuploads%2f2015%2f12%2f40105-gradient-simple_background-colorful-abstract.jpg&ehk=HXCvpXoX%2fSQHIUxEUk8uCjhkgJNzA46%2bX6VinvVPLN8%3d&risl=&pid=ImgRaw&r=0"
-});
+const albumInfo = ref();
 
 // Mock 歌曲列表数据
-const songs = ref([
-	{
-		id: 1,
-		name: "电子梦境",
-		artist: "星尘",
-		mark: "4.9",
-		description: "迷幻电子音乐",
-		createTime: "2024-01-01T00:00:00+08:00",
-		genre: "Electronic",
-		audioUrl: "https://tuneflow.oss-cn-beijing.aliyuncs.com/M500000tt98h4J9oL5.mp3",
-		pictureUrl: "https://th.bing.com/th/id/R.d820b497cc152184d0f6620a9ec15714?rik=NdJJFHHnyGxSVg&riu=http%3a%2f%2fwallup.net%2fwp-content%2fuploads%2f2015%2f12%2f40105-gradient-simple_background-colorful-abstract.jpg&ehk=HXCvpXoX%2fSQHIUxEUk8uCjhkgJNzA46%2bX6VinvVPLN8%3d&risl=&pid=ImgRaw&r=0",
-		lyricUrl: "path/to/lyric1.txt"
-	},
-	{
-		id: 2,
-		name: "夜色旋律",
-		artist: "月光",
-		mark: "4.8",
-		description: "舒缓电子乐",
-		createTime: "2024-01-02T00:00:00+08:00",
-		genre: "Electronic",
-		audioUrl: "https://tuneflow.oss-cn-beijing.aliyuncs.com/M500000tt98h4J9oL5.mp3",
-		pictureUrl: "https://th.bing.com/th/id/R.d820b497cc152184d0f6620a9ec15714?rik=NdJJFHHnyGxSVg&riu=http%3a%2f%2fwallup.net%2fwp-content%2fuploads%2f2015%2f12%2f40105-gradient-simple_background-colorful-abstract.jpg&ehk=HXCvpXoX%2fSQHIUxEUk8uCjhkgJNzA46%2bX6VinvVPLN8%3d&risl=&pid=ImgRaw&r=0",
-		lyricUrl: "path/to/lyric1.txt"
-	}
-]);
+const songs = ref([]);
 
 const formatDuration = (seconds) => {
 	const minutes = Math.floor(seconds / 60);
@@ -137,14 +102,15 @@ onMounted(async () => {
 	<div class="song-list-detail-main-container">
 		<!-- 专辑头部信息 -->
 		<div class="album-header">
-			<img :src="albumInfo.pictureUrl" :alt="albumInfo.name" class="album-cover">
+			<img :src="albumInfo?albumInfo.pictureUrl:''" :alt="albumInfo?albumInfo.name:''" class="album-cover">
 			<div class="album-info">
-				<div class="album-name">{{ albumInfo.name }}</div>
-				<p class="album-description">{{ albumInfo.description }}</p>
+				<div class="album-name">{{ albumInfo?albumInfo.name:'' }}</div>
+				<div class="album-artist-name">{{ albumInfo?albumInfo.userName:'' }}</div>
+				<p class="album-description" v-html="albumInfo?albumInfo.description.replace(/\n/, '<br>'):''"></p>
 				<div class="album-meta">
-					<span class="rating">★ {{ albumInfo.mark }}</span>
+					<span class="rating">★ {{ albumInfo?albumInfo.mark:5 }}</span>
 					<span class="separator">•</span>
-					<span class="date">{{ new Date(albumInfo.createTime).getFullYear() }}</span>
+					<span class="date">{{ new Date(albumInfo?albumInfo.createTime:"1970").getFullYear() }}</span>
 					<span class="separator">•</span>
 					<span class="songs-count">{{ songs.length }} 首歌曲</span>
 				</div>
@@ -193,10 +159,7 @@ onMounted(async () => {
 				</tbody>
 			</table>
 		</div>
-		<div class="loading-container" v-else>
-			<div class="spinner"></div>
-			<p class="loading-text">加载数据中，请稍候...</p>
-		</div>
+		<Loading v-else />
 	</div>
 </template>
 
@@ -236,6 +199,12 @@ onMounted(async () => {
 	text-align: start;
 }
 
+.album-artist-name{
+	font-size: 24px;
+	text-align: start;
+	color: #b3b3b3;
+}
+
 .album-info {
 	display: flex;
 	flex-direction: column;
@@ -252,7 +221,7 @@ onMounted(async () => {
 	font-size: 16px;
 	text-align: start;
 	color: #b3b3b3;
-	margin: 0 0 30px 0;
+	margin: 30px 0 30px 0;
 	line-height: 1.5;
 }
 
