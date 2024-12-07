@@ -456,7 +456,7 @@ export default {
 						ElMessage.success('歌单 ' + songListName.value + ' 创建成功')
 					}else{
 						ElMessage.error('由于添加歌曲到歌单失败，歌单没有被创建')
-						deleteAlbum(res)
+						await deleteAlbum(res)
 						//删除已经上传的歌曲
 						for(let songId of songIds.value){
 							await deleteSong(songId)

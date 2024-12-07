@@ -1,12 +1,13 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import {ref, onMounted} from 'vue';
+import {useRoute} from 'vue-router';
 import {setPlaylistSongs, playSongFromPlaylist, playlist, addSong} from "@/global/playlist";
 import {getAlbum, getAlbumSongs} from "@/api/songlistApi";
 import {ElMessage} from "element-plus";
 
 const route = useRoute();
 const songListId = route.params.song_list_id;
+const isLoading = ref(false);
 
 // Mock 专辑数据
 const albumInfo = ref({
@@ -99,13 +100,14 @@ const addToPlayList = (index) => {
 
 onMounted(async () => {
 	console.log('Song list detail view mounted');
+	isLoading.value = true;
 	//getSongs();
 	songs.value = [];
 	const songlistId = route.params.song_list_id;
 	console.log('Song list id:', songlistId);
 	const sig = await getAlbum(Number(songlistId)).then(res => {
-		console.log('Album res:',res);
-		if(res === undefined){
+		console.log('Album res:', res);
+		if (res === undefined) {
 			return -1;
 		}
 		albumInfo.value = res.data.result;
@@ -114,7 +116,7 @@ onMounted(async () => {
 		ElMessage.error('获取专辑信息失败，您可能没有互联网连接');
 		return -1;
 	});
-	if(sig === -1){
+	if (sig === -1) {
 		return;
 	}
 	for (let i = 0; i < albumInfo.value.songsId.length; i++) {
@@ -127,6 +129,7 @@ onMounted(async () => {
 		});
 	}
 	await getAllSongsAudioDuration()
+	isLoading.value = false;
 });
 </script>
 
@@ -159,7 +162,7 @@ onMounted(async () => {
 		</div>
 
 		<!-- 歌曲列表 -->
-		<div class="songs-list">
+		<div class="songs-list" v-if="!isLoading">
 			<table>
 				<thead>
 				<tr>
@@ -174,7 +177,7 @@ onMounted(async () => {
 				<tbody>
 				<tr v-for="(song, index) in songs" :key="song.id" class="song-row">
 					<td class="add-to-playlist-btn" @click="addToPlayList(index)">
-<!--						add to playlist button-->
+						<!--						add to playlist button-->
 						<span class="material-icons">playlist_add</span>
 					</td>
 					<td @click="playSong(index)">{{ index + 1 }}</td>
@@ -185,10 +188,30 @@ onMounted(async () => {
 					<td @click="playSong(index)">{{ song.artist }}</td>
 					<td @click="playSong(index)">{{ song.genre }}</td>
 					<!-- 根据音频 URL获取时长 -->
-					<td @click="playSong(index)">{{song.duration}}</td>
+					<td @click="playSong(index)">{{ song.duration }}</td>
 				</tr>
 				</tbody>
 			</table>
+		</div>
+		<div class="loading-container" v-else>
+<!--			&lt;!&ndash; 加载动画 &ndash;&gt;-->
+<!--			<div class="spinner"></div>-->
+<!--			<p class="loading-text">加载中，请稍候...</p>-->
+			<table>
+				<thead>
+				<tr>
+					<th></th>
+					<th>#</th>
+					<th>标题</th>
+					<th>艺术家</th>
+					<th>流派</th>
+					<th>时长</th>
+				</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+			<el-skeleton :rows="5" animated :loading="isLoading" style="width: 100%; padding-top: 40px;"></el-skeleton>
 		</div>
 	</div>
 </template>
@@ -223,7 +246,7 @@ onMounted(async () => {
 	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
-.album-name{
+.album-name {
 	font-size: 48px;
 	font-weight: bold;
 	text-align: start;
@@ -306,7 +329,7 @@ th {
 	font-weight: normal;
 }
 
-.add-to-playlist-btn{
+.add-to-playlist-btn {
 	cursor: pointer;
 	width: 24px;
 }
@@ -339,6 +362,51 @@ td {
 	object-fit: cover;
 }
 
+
+.loading-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 100%;
+	color: #555;
+}
+
+.loading-text{
+	margin-top: 16px;
+	font-size: 16px;
+	color: #666;
+	font-weight: bold;
+}
+
+.spinner {
+	width: 30px;
+	height: 30px;
+	border: 5px solid #c4c4c4;
+	border-top: 5px solid #000000;
+	border-radius: 50%;
+	animation: spin 1s linear infinite;
+}
+
+/* 动画关键帧 */
+@keyframes spin {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+/* 加载文字样式 */
+.loading-container p {
+	margin-top: 16px;
+	font-size: 14px;
+	color: #666;
+}
+
+
 @container song-list-detail (max-width: 820px) {
 	.song-list-detail-main-container {
 		padding: 20px;
@@ -364,7 +432,7 @@ td {
 }
 
 @container song-list-detail (max-width: 1200px) {
-	.album-cover{
+	.album-cover {
 		width: 240px;
 		height: 240px;
 	}
