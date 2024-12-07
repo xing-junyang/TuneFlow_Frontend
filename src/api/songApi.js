@@ -55,3 +55,20 @@ export function updateSongList(data) {
         data
     })
 }
+
+// 创建歌曲
+export function createSong(data) {
+    return request({
+        url: '/api/songs/create',
+        method: 'post',
+        data
+    })
+}
+
+// 删除歌曲
+export function deleteSong(songId) {
+    return request({
+        url: `/api/songs/delete/${songId}`,
+        method: 'delete'
+    })
+}
