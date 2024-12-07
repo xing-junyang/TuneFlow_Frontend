@@ -1,123 +1,213 @@
 <template>
-  <div class="chat-container">
-    <div class="messages">
-      <div v-for="(msg, index) in messages" :key="index" :class="msg.role">
-        <strong>{{ msg.role === 'user' ? '用户' : '助手' }}:</strong>
-        <span>{{ msg.content }}</span>
-      </div>
-    </div>
-    <div class="input-area">
-      <input
-          v-model="userInput"
-          @keyup.enter="handleSend"
-          placeholder="请输入您的消息..."
-      />
-      <button @click="handleSend">发送</button>
-    </div>
-    <div v-if="loading" class="loading">助手正在回复...</div>
-    <div v-if="error" class="error">{{ error }}</div>
-  </div>
+	<div class="chat-container">
+		<div class="messages">
+			<TransitionGroup name="list">
+				<div v-for="(msg, index) in messages" :key="index" :class="msg.role">
+					<strong style="color: #949494; font-weight: 900">{{ msg.role === 'user' ? '用户' : '助手' }}: </strong>
+					<span>{{ msg.content }}</span>
+				</div>
+			</TransitionGroup>
+		</div>
+		<div class="input-area">
+			<input
+				v-model="userInput"
+				@keyup.enter="handleSend"
+				placeholder="请输入您的消息..."
+			/>
+			<button @click="handleSend">发送</button>
+		</div>
+		<div v-if="loading" class="loading">助手正在回复...</div>
+		<div v-if="error" class="error">{{ error }}</div>
+	</div>
 </template>
 
 <script>
-import { sendChatMessage } from '@/api/chat';
+import {sendChatMessage} from '@/api/chat';
 
 export default {
-  name: 'Chat',
-  data() {
-    return {
-      messages: [
-        {
-          role: 'system',
-          content: '你是豆包，是由字节跳动开发的 AI 人工智能助手',
-        },
-      ],
-      userInput: '',
-      loading: false,
-      error: '',
-      model: 'ep-20241206163424-4wqwd', // 确保替换为有效的模型ID
-    };
-  },
-  methods: {
-    async handleSend() {
-      const content = this.userInput.trim();
-      if (!content) return;
+	name: 'Chat',
+	data() {
+		return {
+			messages: [
+				{
+					role: 'system',
+					content: '你是豆包，是由字节跳动开发的 AI 人工智能助手',
+				},
+			],
+			userInput: '',
+			loading: false,
+			error: '',
+			model: 'ep-20241206163424-4wqwd', // 确保替换为有效的模型ID
+		};
+	},
+	methods: {
+		async handleSend() {
+			const content = this.userInput.trim();
+			if (!content) return;
 
-      // 添加用户消息到消息列表
-      this.messages.push({
-        role: 'user',
-        content,
-      });
+			// 添加用户消息到消息列表
+			this.messages.push({
+				role: 'user',
+				content,
+			});
 
-      // 清空输入框
-      this.userInput = '';
-      this.loading = true;
-      this.error = '';
+			// 清空输入框
+			this.userInput = '';
+			this.loading = true;
+			this.error = '';
 
-      try {
-        // 发送消息给后端，并获取助手的回复
-        const response = await sendChatMessage(this.model, this.messages);
-        const assistantMessage = response.data.choices[0].message.content;
+			try {
+				// 发送消息给后端，并获取助手的回复
+				const response = await sendChatMessage(this.model, this.messages);
+				const assistantMessage = response.data.choices[0].message.content;
 
-        // 添加助手回复到消息列表
-        this.messages.push({
-          role: 'assistant',
-          content: assistantMessage,
-        });
-      } catch (err) {
-        console.error(err);
-        this.error = err.response?.data?.message || '请求失败，请稍后重试。';
-      } finally {
-        this.loading = false;
-      }
-    },
-  },
+				// 添加助手回复到消息列表
+				this.messages.push({
+					role: 'assistant',
+					content: assistantMessage,
+				});
+			} catch (err) {
+				console.error(err);
+				this.error = err.response?.data?.message || '请求失败，请稍后重试。';
+			} finally {
+				this.loading = false;
+			}
+		},
+	},
 };
 </script>
 
 <style scoped>
 .chat-container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
+	max-width: 600px;
+	margin: 0 auto;
+	padding: 0 20px 10px;
 }
 
 .messages {
-  max-height: 400px;
-  overflow-y: auto;
-  margin-bottom: 20px;
+	max-height: 400px;
+	overflow-y: auto;
+	margin-bottom: 20px;
+	color: white;
 }
 
 .messages div {
-  margin-bottom: 10px;
+	margin-bottom: 10px;
 }
 
 .messages .user {
-  text-align: right;
+	text-align: right;
+}
+
+.list-enter-active,
+.list-leave-active {
+	transition: all 0.5s ease;
+}
+.list-enter-from,
+.list-leave-to {
+	opacity: 0;
+	transform: translateX(30px);
+}
+
+.list-leave-active {
+	position: absolute;
 }
 
 .input-area {
-  display: flex;
+	display: flex;
 }
 
 .input-area input {
-  flex: 1;
-  padding: 10px;
-  font-size: 16px;
+	flex: 1;
+	padding: 10px;
+	font-size: 16px;
 }
 
 .input-area button {
-  padding: 10px 20px;
-  font-size: 16px;
+	padding: 10px 20px;
+	font-size: 16px;
+}
+
+input {
+	width: calc(100% - 40px);
+	padding: 12px 16px;
+	border: 2px solid rgba(255, 255, 255, 0.1);
+	border-radius: 12px;
+	background: rgba(255, 255, 255, 0.05);
+	color: #fff;
+	font-size: 1rem;
+	transition: all 0.3s ease;
+}
+
+input:focus {
+	outline: none;
+	border-color: #1db954;
+	box-shadow: 0 0 0 4px rgba(29, 185, 84, 0.1);
+	animation: inputPulse 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+input::placeholder {
+	color: rgba(255, 255, 255, 0.3);
 }
 
 .loading {
-  margin-top: 10px;
-  color: #888;
+	margin-top: 10px;
+	color: #888;
+	animation: fadeIn 1s ease forwards;
 }
 
 .error {
-  margin-top: 10px;
-  color: red;
+	margin-top: 10px;
+	color: red;
+	animation: fadeIn 1s ease forwards;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+button{
+	width: 15%;
+	border: none;
+	margin-left: 10px;
+	border-radius: 12px;
+	background: linear-gradient(45deg, #1db954, #1ed760);
+	color: #fff;
+	font-size: 1rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+}
+
+button:not(:disabled):hover {
+	transform: translateY(-2px);
+	box-shadow: 0 6px 20px rgba(29, 185, 84, 0.4);
+}
+
+button:disabled {
+	opacity: 0.7;
+	cursor: not-allowed;
+	transform: none;
+}
+
+@keyframes inputPulse {
+	0% {
+		box-shadow: 0 0 0 0 rgba(29, 185, 84, 0.4);
+	}
+	70% {
+		box-shadow: 0 0 0 10px rgba(29, 185, 84, 0);
+	}
+	100% {
+		box-shadow: 0 0 0 0 rgba(29, 185, 84, 0);
+	}
 }
 </style>

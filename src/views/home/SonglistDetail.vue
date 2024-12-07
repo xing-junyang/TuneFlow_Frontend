@@ -115,14 +115,14 @@ onMounted(async () => {
 					<span class="separator">•</span>
 					<span class="date">{{ new Date(albumInfo?albumInfo.createTime:"1970").getFullYear() }}</span>
 					<span class="separator">•</span>
-					<span class="songs-count">{{ songs.length }} 首歌曲</span>
+					<span class="songs-count">{{ albumInfo?albumInfo.songsId.length:0 }} 首歌曲</span>
 				</div>
 			</div>
 		</div>
 
 		<!-- 播放控制栏 -->
 		<div class="controls">
-			<button class="play-all-btn" @click="playAll">
+			<button class="play-all-btn" @click="playAll" :disabled="isLoading">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
 					<path d="M8 5v14l11-7z"/>
 				</svg>
@@ -257,11 +257,16 @@ onMounted(async () => {
 	font-size: 16px;
 	font-weight: bold;
 	cursor: pointer;
-	transition: background-color 0.2s ease;
+	transition: background-color 0.5s ease;
 }
 
 .play-all-btn:hover {
 	background-color: #1ed760;
+}
+
+.play-all-btn:disabled {
+	background-color: #666;
+	cursor: not-allowed;
 }
 
 .play-all-btn svg {
