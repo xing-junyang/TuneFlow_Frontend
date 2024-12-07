@@ -131,6 +131,11 @@ const navigateToAlbum = (albumId) => {
 	router.push({ name: 'SonglistDetail', params: { song_list_id: albumId } });
 };
 
+const playAlbum = async (albumId) => {
+	// 播放专辑的逻辑
+	console.log('Play album:', albumId);
+};
+
 onMounted(async () => {
 	// 在这里执行初始化逻辑
 	console.log('FeatureView mounted');
@@ -157,7 +162,7 @@ onMounted(async () => {
 <!--						Display album image-->
 						<img :src="album.pictureUrl" :alt="album.name" class="album-image" />
 					</div>
-					<div class="play-button" @click="playAlbum">
+					<div class="play-button" @click="playAlbum(album.id)">
 						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
 							<path d="M8 5v14l11-7z"/>
 						</svg>

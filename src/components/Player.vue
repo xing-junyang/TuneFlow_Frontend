@@ -506,19 +506,23 @@ export default {
 				}
 				if (newSong.audioUrl && newSong.audioUrl !== '') {
 					this.$nextTick(() => {
-						//Before playing the song, check if it is already playing.
-						if(!this.isPlaying){
-							this.$refs.audioRef.load()
-							this.$refs.audioRef.currentTime = 0
-							this.$refs.audioRef.play()
-							this.isPlaying = true
-						}else{
-							this.$refs.audioRef.pause()
-							this.$refs.audioRef.load()
-							this.$refs.audioRef.currentTime = 0
-							this.$refs.audioRef.play()
+						try{
+							//Before playing the song, check if it is already playing.
+							if(!this.isPlaying){
+								this.$refs.audioRef.load()
+								this.$refs.audioRef.currentTime = 0
+								this.$refs.audioRef.play()
+								this.isPlaying = true
+							}else{
+								this.$refs.audioRef.pause()
+								this.$refs.audioRef.load()
+								this.$refs.audioRef.currentTime = 0
+								this.$refs.audioRef.play()
+							}
+							//After this, the song should play.
+						}catch (e){
+							console.log("Error playing song", e)
 						}
-						//After this, the song should play.
 					})
 				}
 			},
