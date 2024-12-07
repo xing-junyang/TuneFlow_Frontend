@@ -9,10 +9,10 @@ import Loading from "@/components/Loading.vue";
 const route = useRoute();
 const isLoading = ref(false);
 
-// Mock 专辑数据
+// 专辑数据
 const albumInfo = ref();
 
-// Mock 歌曲列表数据
+// 歌曲列表数据
 const songs = ref([]);
 
 const formatDuration = (seconds) => {
@@ -76,6 +76,7 @@ onMounted(async () => {
 			return -1;
 		}
 		albumInfo.value = res.data.result;
+		albumInfo.value.description = albumInfo.value.description.replace(/\\n|\n/g, '<br><br>');
 	}).catch(err => {
 		console.log(err)
 		ElMessage.error('获取专辑信息失败，您可能没有互联网连接');
@@ -96,6 +97,8 @@ onMounted(async () => {
 	await getAllSongsAudioDuration()
 	isLoading.value = false;
 });
+
+
 </script>
 
 <template>
@@ -106,7 +109,7 @@ onMounted(async () => {
 			<div class="album-info">
 				<div class="album-name">{{ albumInfo?albumInfo.name:'' }}</div>
 				<div class="album-artist-name">{{ albumInfo?albumInfo.userName:'' }}</div>
-				<p class="album-description" v-html="albumInfo?albumInfo.description.replace(/\n/, '<br>'):''"></p>
+				<p class="album-description" v-html="albumInfo?albumInfo.description:''"></p>
 				<div class="album-meta">
 					<span class="rating">★ {{ albumInfo?albumInfo.mark:5 }}</span>
 					<span class="separator">•</span>
@@ -223,6 +226,7 @@ onMounted(async () => {
 	color: #b3b3b3;
 	margin: 30px 0 30px 0;
 	line-height: 1.5;
+	white-space: pre-line;
 }
 
 .album-meta {
