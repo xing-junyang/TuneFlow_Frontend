@@ -1,9 +1,10 @@
 <script setup>
 import {onMounted, ref} from 'vue';
 import router from "@/router";
-import {getAlbums} from "@/api/songlistApi";
+import {getAlbumAllSongs, getAlbums} from "@/api/songlistApi";
 import {ElMessage} from "element-plus";
 import Loading from "@/components/Loading.vue";
+import {playSongFromPlaylist, setPlaylistSongs} from "@/global/playlist";
 
 // 模拟专辑数据
 // const albums = ref([
@@ -134,6 +135,16 @@ const navigateToAlbum = (albumId) => {
 const playAlbum = async (albumId) => {
 	// 播放专辑的逻辑
 	console.log('Play album:', albumId);
+	getAlbumAllSongs(albumId).then((res) => {
+		console.log('Songs in album:', res.data.result);
+		// Play the songs in the album
+		const songs = res.data.result;
+		setPlaylistSongs(songs);
+		playSongFromPlaylist();
+	}).catch((err) => {
+		console.error('Failed to get songs in album:', err);
+		ElMessage.error('获取专辑歌曲失败，您可能没有互联网连接');
+	});
 };
 
 onMounted(async () => {
@@ -156,9 +167,9 @@ onMounted(async () => {
 		<div class="feature-title">为你推荐</div>
 
 		<div class="albums-grid" v-if="!isLoading">
-			<div v-for="album in albums" :key="album.id" class="album-card" @click="navigateToAlbum(album.id)">
+			<div v-for="album in albums" :key="album.id" class="album-card">
 				<div class="album-cover">
-					<div class="album-image">
+					<div class="album-image" @click="navigateToAlbum(album.id)">
 <!--						Display album image-->
 						<img :src="album.pictureUrl" :alt="album.name" class="album-image" />
 					</div>
@@ -235,8 +246,8 @@ onMounted(async () => {
 	position: absolute;
 	bottom: 8px;
 	right: 8px;
-	width: 40px;
-	height: 40px;
+	width: 54px;
+	height: 54px;
 	background-color: #1db954;
 	border-radius: 50%;
 	display: flex;
@@ -247,8 +258,8 @@ onMounted(async () => {
 }
 
 .play-button svg {
-	width: 24px;
-	height: 24px;
+	width: 36px;
+	height: 36px;
 	color: white;
 }
 

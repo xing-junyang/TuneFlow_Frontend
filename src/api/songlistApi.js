@@ -39,6 +39,19 @@ export function getAlbumSongs(id) {
     return axios(config);
 }
 
+export function getAlbumAllSongs(songlistid){
+    const config = {
+        method: 'get',
+        url: '/api/songlists/getSongs/' + songlistid,
+        headers: {
+            'Content-Type': 'application/json',
+            'token': sessionStorage.getItem('token') == null? localStorage.getItem('token'): sessionStorage.getItem('token')
+        }
+    };
+
+    return axios(config);
+}
+
 export function createAlbum(data) {
     const config = {
         method: 'post',
