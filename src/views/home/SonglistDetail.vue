@@ -1,5 +1,5 @@
 <script setup>
-import {ref, onMounted} from 'vue';
+import {ref, onMounted, computed} from 'vue';
 import {useRoute} from 'vue-router';
 import {setPlaylistSongs, playSongFromPlaylist, playlist, addSong} from "@/global/playlist";
 import {getAlbum, getAlbumAllSongs} from "@/api/songlistApi";
@@ -14,6 +14,25 @@ const albumInfo = ref();
 
 // 歌曲列表数据
 const songs = ref([]);
+
+const isCollapsed = ref(true);
+const limit = 200;
+const showExpandButton = computed(() => {return albumInfo.value===undefined? '' : albumInfo.value.description.length > limit});
+const shortenedDescription = computed(() => {
+	console.log('Album info:', albumInfo.value);
+	if(albumInfo.value===undefined){
+		return '';
+	}
+	if (isCollapsed.value && showExpandButton.value) {
+		return albumInfo.value.description.slice(0, limit) + '...';
+	}
+	return albumInfo.value.description;
+});
+
+const toggleCollapse = () => {
+	isCollapsed.value = !isCollapsed.value;
+};
+
 
 const formatDuration = (seconds) => {
 	const minutes = Math.floor(seconds / 60);
@@ -107,7 +126,10 @@ onMounted(async () => {
 			<div class="album-info">
 				<div class="album-name">{{ albumInfo?albumInfo.name:'' }}</div>
 				<div class="album-artist-name">{{ albumInfo?albumInfo.userName:'' }}</div>
-				<p class="album-description" v-html="albumInfo?albumInfo.description:''"></p>
+				<p class="album-description" :class="{ collapsed: isCollapsed }" v-html="shortenedDescription"></p>
+				<button class="expand-button" v-if="showExpandButton" @click="toggleCollapse">
+					{{ isCollapsed ? '展开' : '收起' }}
+				</button>
 				<div class="album-meta">
 					<span class="rating">★ {{ albumInfo?albumInfo.mark:5 }}</span>
 					<span class="separator">•</span>
@@ -222,9 +244,26 @@ onMounted(async () => {
 	font-size: 16px;
 	text-align: start;
 	color: #b3b3b3;
-	margin: 30px 0 30px 0;
-	line-height: 1.5;
+	margin: 30px 0 0px 0;
+	line-height: 1.5em;
 	white-space: pre-line;
+
+}
+
+.expand-button {
+	background-color: transparent;
+	border: none;
+	color: #007bff;
+	cursor: pointer;
+	font-size: 14px;
+	margin: 0 0 30px;
+	padding: 0;
+	text-align: start;
+	transition: color 0.5s ease;
+}
+
+.expand-button:hover {
+	color: #0056b3;
 }
 
 .album-meta {
