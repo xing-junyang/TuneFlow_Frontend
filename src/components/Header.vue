@@ -329,7 +329,7 @@
 		<div v-if="isChatOpen" class="modal-overlay" @click.self="closeChat">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h2>聊天助手</h2>
+					<h2>听歌助手小T</h2>
 					<button class="close-button" @click="closeChat">
 						<span class="material-icons">close</span>
 					</button>

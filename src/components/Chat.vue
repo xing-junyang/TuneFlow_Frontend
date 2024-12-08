@@ -1,79 +1,93 @@
 <template>
-	<div class="chat-container">
-		<div class="messages">
-			<TransitionGroup name="list">
-				<div v-for="(msg, index) in messages" :key="index" :class="msg.role">
-					<strong style="color: #949494; font-weight: 900">{{ msg.role === 'user' ? '用户' : '助手' }}: </strong>
-					<span>{{ msg.content }}</span>
-				</div>
-			</TransitionGroup>
-		</div>
-		<div class="input-area">
-			<input
-				v-model="userInput"
-				@keyup.enter="handleSend"
-				placeholder="请输入您的消息..."
-			/>
-			<button @click="handleSend">发送</button>
-		</div>
-		<div v-if="loading" class="loading">助手正在回复...</div>
-		<div v-if="error" class="error">{{ error }}</div>
-	</div>
+  <div class="chat-container">
+    <div class="messages">
+      <TransitionGroup name="list">
+        <div
+            v-for="(msg, index) in messages"
+            :key="index"
+            :class="[msg.role === 'user' ? 'user' : 'assistant']"
+        >
+          <strong style="color: #949494; font-weight: 900">
+            {{ msg.role === 'user' ? currentUsername : '小T' }}:
+          </strong>
+          <span v-if="msg.role === 'user'">{{ msg.content }}</span>
+          <span v-else v-html="renderMarkdown(msg.content)"></span>
+        </div>
+      </TransitionGroup>
+    </div>
+    <div class="input-area">
+      <input
+          v-model="userInput"
+          @keyup.enter="handleSend"
+          placeholder="请输入您的消息..."
+      />
+      <button @click="handleSend">发送</button>
+    </div>
+    <div v-if="loading" class="loading">小T正在思考...</div>
+    <div v-if="error" class="error">{{ error }}</div>
+  </div>
 </template>
 
 <script>
-import {sendChatMessage} from '@/api/chat';
+import { marked } from 'marked';
+import { sendChatMessage } from '@/api/chat';
+import { getUserName } from '@/utils'; // 引入 getUserName 函数
 
 export default {
-	name: 'Chat',
-	data() {
-		return {
-			messages: [
-				{
-					role: 'system',
-					content: '你是豆包，是由字节跳动开发的 AI 人工智能助手',
-				},
-			],
-			userInput: '',
-			loading: false,
-			error: '',
-			model: 'ep-20241206163424-4wqwd', // 确保替换为有效的模型ID
-		};
-	},
-	methods: {
-		async handleSend() {
-			const content = this.userInput.trim();
-			if (!content) return;
+  name: 'Chat',
+  data() {
+    return {
+      messages: [
+        {
+          role: 'system',
+          content: '嗨，欢迎回来！想听点什么或了解哪首歌呢？',
+        },
+      ],
+      userInput: '',
+      loading: false,
+      error: '',
+      model: 'ep-20241206163424-4wqwd', // 确保替换为有效的模型ID
+      currentUsername: getUserName() || '用户', // 动态获取用户名
+    };
+  },
+  methods: {
+    async handleSend() {
+      const content = this.userInput.trim();
+      if (!content) return;
 
-			// 添加用户消息到消息列表
-			this.messages.push({
-				role: 'user',
-				content,
-			});
+      // 添加用户消息到消息列表
+      this.messages.push({
+        role: 'user',
+        content,
+      });
 
-			// 清空输入框
-			this.userInput = '';
-			this.loading = true;
-			this.error = '';
+      // 清空输入框
+      this.userInput = '';
+      this.loading = true;
+      this.error = '';
 
-			try {
-				// 发送消息给后端，并获取助手的回复
-				const response = await sendChatMessage(this.model, this.messages);
-				const assistantMessage = response.data.choices[0].message.content;
+      try {
+        // 发送消息给后端，并获取助手的回复
+        const response = await sendChatMessage(content);
+        const assistantMessage = response.data.result;
 
-				// 添加助手回复到消息列表
-				this.messages.push({
-					role: 'assistant',
-					content: assistantMessage,
-				});
-			} catch (err) {
-				console.error(err);
-				this.error = err.response?.data?.message || '请求失败，请稍后重试。';
-			} finally {
-				this.loading = false;
-			}
-		},
-	},
+        // 添加助手回复到消息列表
+        this.messages.push({
+          role: 'assistant',
+          content: assistantMessage,
+        });
+      } catch (err) {
+        console.error(err);
+        this.error = err.response?.data?.message || '请求失败，请稍后重试。';
+      } finally {
+        this.loading = false;
+      }
+    },
+    renderMarkdown(content) {
+      // 将 Markdown 转换为 HTML
+      return marked(content);
+    },
+  },
 };
 </script>
 
@@ -85,20 +99,29 @@ export default {
 }
 
 .messages {
-	max-height: 400px;
-	overflow-y: auto;
-	margin-bottom: 20px;
-	color: white;
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  color: white;
+  text-align: left; /* 确保文本内容靠左对齐 */
 }
 
 .messages div {
-	margin-bottom: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column; /* 确保内容上下堆叠 */
+  align-items: flex-start; /* 确保内容靠左对齐 */
 }
 
 .messages .user {
-	text-align: right;
+  text-align: right; /* 用户消息仍保持右对齐 */
+  align-items: flex-end; /* 用户消息框靠右 */
 }
 
+.messages .assistant {
+  text-align: left; /* 助手消息靠左对齐 */
+  align-items: flex-start; /* 助手消息框靠左 */
+}
 .list-enter-active,
 .list-leave-active {
 	transition: all 0.5s ease;
