@@ -15,6 +15,9 @@
         </div>
       </TransitionGroup>
     </div>
+    <div class="notice">
+      由豆包提供大模型服务
+    </div>
     <div class="input-area">
       <input
           v-model="userInput"
@@ -27,6 +30,7 @@
     <div v-if="error" class="error">{{ error }}</div>
   </div>
 </template>
+
 
 <script>
 import { marked } from 'marked';
@@ -92,6 +96,16 @@ export default {
 </script>
 
 <style scoped>
+.notice {
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #888;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 5px 0;
+  border-radius: 8px;
+}
+
 .chat-container {
 	max-width: 600px;
 	margin: 0 auto;
