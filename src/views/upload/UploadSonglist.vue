@@ -5,7 +5,7 @@
 			<div class="upload-header">
 				<h2>
 					<span class="material-icons">music_note</span>
-					上传歌单
+					上传专辑歌单
 				</h2>
 				<p class="subtitle">上传您的心仪歌单！</p>
 			</div>
@@ -25,6 +25,15 @@
 						作者
 					</label>
 					<input type="text" v-model="songListArtistName" required :class="{ 'has-value': songListArtistName }" placeholder="请输入作者名称">
+				</div>
+
+				<div class="form-group">
+					<label>
+						<span class="material-icons">calendar_month</span>
+						年份
+					</label>
+					<input type="text" v-model="songListYear" required :class="{ 'has-value': songListYear }" placeholder="请输入发行年份">
+					<span v-if="!isYearValid" class="error-message">请输入正确的年份</span>
 				</div>
 
 				<div class="form-group">
@@ -231,6 +240,7 @@ export default {
 		const songListDescription = ref('')
 		const songListPictureUrl = ref('')
 		const songListArtistName = ref('')
+		const songListYear = ref("2023")
 		const songListSongIds = ref([])
 
 		//song
@@ -270,14 +280,26 @@ export default {
 		 */
 		const uploadSongs = ref([])
 
+		const isYearValid = computed(() => {
+			//check whether the input is number and a valid year
+			if(songListYear.value === ''){
+				return true
+			}
+			for (let i = 0; i < songListYear.value.length; i++) {
+				if (songListYear.value[i] < '0' || songListYear.value[i] > '9') {
+					return false
+				}
+			}
+			return Number(songListYear.value) > 1800 && Number(songListYear.value) < 2030
+		})
+
 		// URL checker
 		const isSongPictureUrlValid = computed(() => {
 			return /^(http|https):\/\/[^ "]+$/.test(songPictureUrl.value)
 		})
 
-
 		const isUploadSongListFormValid = computed(() => {
-			return songListName.value && songListDescription.value && songListPictureUrl.value && uploadSongs.value.length > 0
+			return songListName.value && songListDescription.value && songListPictureUrl.value && uploadSongs.value.length > 0 && isYearValid.value
 		})
 
 		const isUploadSongFormValid = computed(() => {
@@ -416,6 +438,7 @@ export default {
 					description: songListDescription.value,
 					pictureUrl: songListPictureUrl.value,
 					userName: songListArtistName.value,
+					year: songListYear.value
 				}
 				const res = await createAlbum(songListData).then(
 					(res) => {
@@ -485,7 +508,9 @@ export default {
 			songListArtistName,
 			songListDescription,
 			songListPictureUrl,
+			songListYear,
 			songListSongIds,
+			isYearValid,
 			isSongPictureUrlValid,
 			isUploadSongListFormValid,
 			isUploadSongFormValid,
@@ -724,7 +749,9 @@ export default {
 
 input[type="tel"],
 input[type="password"],
-input[type="text"] {
+input[type="text"],
+input[type="year"],
+input[type="number"] {
 	width: calc(100% - 40px);
 	padding: 12px 16px;
 	border: 2px solid rgba(255, 255, 255, 0.1);
@@ -868,6 +895,15 @@ input::placeholder {
 	color: #ff4444;
 	font-size: 0.8rem;
 	margin-top: 4px;
+}
+
+.error-message{
+	display: block;
+	font-size: 0.8rem;
+	margin-top: 4px;
+	color: #ff4444;
+	transition: color 0.3s ease;
+	font-weight: bold;
 }
 
 /* 加载状态 */
