@@ -2,7 +2,7 @@
 import {ref, onMounted} from 'vue';
 import {useRoute} from 'vue-router';
 import {setPlaylistSongs, playSongFromPlaylist, playlist, addSong} from "@/global/playlist";
-import {getAlbum, getAlbumSongs} from "@/api/songlistApi";
+import {getAlbum, getAlbumAllSongs} from "@/api/songlistApi";
 import {ElMessage} from "element-plus";
 import Loading from "@/components/Loading.vue";
 
@@ -85,15 +85,13 @@ onMounted(async () => {
 	if (sig === -1) {
 		return;
 	}
-	for (let i = 0; i < albumInfo.value.songsId.length; i++) {
-		await getAlbumSongs(Number(albumInfo.value.songsId[i])).then(res => {
-			console.log(res);
-			songs.value.push(res.data.result);
-		}).catch(err => {
-			console.log(err)
-			ElMessage.error('获取歌曲信息失败，您可能没有互联网连接');
-		});
-	}
+	await getAlbumAllSongs(Number(songlistId)).then(res => {
+		console.log('Songs in album:', res.data.result);
+		songs.value = res.data.result;
+	}).catch(err => {
+		console.error('Failed to get songs in album:', err);
+		ElMessage.error('获取专辑歌曲失败，您可能没有互联网连接');
+	});
 	await getAllSongsAudioDuration()
 	isLoading.value = false;
 });
