@@ -44,8 +44,12 @@
 					<i class="fas fa-step-forward"></i>
 				</button>
 
-				<button class="playlist-btn" @click="togglePlaylist" title="播放列表">
-					<i class="fas fa-list"></i>
+				<button class="playlist-btn" :class="{ active: showPlaylist }" @click="togglePlaylist" title="播放列表">
+					<i class="fa-solid fa-list-ol"></i>
+				</button>
+
+				<button class="lyric-btn" :class="{ active: showLyric }" @click="toggleLyric" title="歌词" :disabled="!currentSong||currentSong.lyricUrl === undefined||currentSong.lyricUrl === ''">
+					<i class="fa-solid fa-square-poll-horizontal"></i>
 				</button>
 			</div>
 
@@ -91,7 +95,7 @@
 		<div class="playlist-content">
 			<div class="playlist-header">
 				<div class="header-left">
-					<i class="fas fa-music playlist-icon"></i>
+					<i style="color: #00c853" class="fa-solid fa-list-ol"></i>
 					<h3>播放列表</h3>
 					<span class="song-count">({{ playlist.songs.length }}首)</span>
 				</div>
@@ -182,14 +186,41 @@
 			</div>
 		</div>
 	</div>
+	<!--歌词上拉栏-->
+	<div
+		class="playlist-drawer"
+		:class="{ 'drawer-open': showLyric && show }"
+	>
+		<div class="playlist-content">
+			<div class="playlist-header">
+				<div class="header-left">
+					<i class="fa-solid fa-square-poll-horizontal" style="color: #00c853;"></i>
+					<h3>歌词</h3>
+				</div>
+				<div class="header-right">
+					<button class="header-btn" @click="toggleLyric" title="关闭">
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+			</div>
 
+			<div class="playlist-container">
+				<Loading v-if="isLoadingLyric" />
+				<div v-else class="song-lyric">
+					<div v-html="songLyric" class="song-lyric-content"></div>
+				</div>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script>
 import {clearPlaylist, playlist, playSongFromPlaylistByIndex} from "@/global/playlist";
+import Loading from "@/components/Loading.vue";
 
 export default {
 	name: 'PlayerBar',
+	components: {Loading},
 	props: {
 		show: {
 			type: Boolean,
@@ -209,6 +240,9 @@ export default {
 			playMode: 'loop', // 'loop' | 'single' | 'random'
 			playlist,
 			showPlaylist: false,
+			showLyric: false,
+			songLyric: '',
+			isLoadingLyric: false,
 			currentSong: {
 				type: {
 					id: Number,
@@ -275,6 +309,30 @@ export default {
 
 		togglePlaylist() {
 			this.showPlaylist = !this.showPlaylist
+			this.showLyric = false
+		},
+
+		toggleLyric() {
+			this.showLyric = !this.showLyric
+			this.showPlaylist = false
+		},
+
+		async loadLyric(){
+			if(this.currentSong.lyricUrl === ''){
+				this.showLyric = false
+				return;
+			}
+			this.isLoadingLyric = true
+			try {
+				const request = new Request(this.currentSong.lyricUrl)
+				const response = await fetch(request)
+				console.log("Lyric response", response)
+				this.songLyric = await response.text()
+				this.songLyric = this.songLyric + "<br><br>"
+			}catch (e){
+				console.log("Error loading lyric", e)
+			}
+			this.isLoadingLyric = false
 		},
 
 		async changeSong(newSong) {
@@ -301,6 +359,7 @@ export default {
 						this.$refs.audioRef.currentTime = 0
 						await this.$refs.audioRef.play()
 					}
+					await this.loadLyric()
 					//After this, the song should play.
 				}
 				this.isChanging = false
@@ -537,9 +596,7 @@ export default {
 		},
 
 		checkScreenWidth() {
-			if (window.innerWidth < 920) {
-				this.isWideScreen = false
-			}
+			this.isWideScreen = window.innerWidth >= 920;
 		},
 	},
 
@@ -701,7 +758,23 @@ export default {
 
 .playlist-btn {
 	font-size: 18px !important;
-	margin: 0 30px;
+	margin: 0 0 0 15px;
+}
+
+.playlist-btn.active {
+	color: #1db954;
+}
+
+.lyric-btn{
+	font-size: 18px !important;
+}
+
+.lyric-btn.active {
+	color: #1db954;
+}
+
+.lyric-btn:disabled{
+	color: #999;
 }
 
 .progress-bar {
@@ -857,7 +930,6 @@ export default {
 	justify-content: space-between;
 	align-items: center;
 	padding: 16px 20px;
-	border-bottom: 1px solid var(--color-border);
 	background: var(--color-background-light);
 }
 
@@ -1057,6 +1129,36 @@ export default {
 .empty-playlist i {
 	font-size: 48px;
 	margin-bottom: 16px;
+}
+
+.lyric-container {
+	flex: 1;
+	overflow: scroll;
+	position: relative;
+}
+
+
+.song-lyric{
+	overflow: scroll;
+	display: flex;
+	overflow-y: auto;
+	height: 100%;
+}
+
+.song-lyric-content{
+	flex: 1;
+	white-space: pre-wrap;
+	padding: 20px;
+	text-align: start;
+	font-size: 14px;
+	font-weight: normal;
+	color: #eee;
+}
+
+.song-lyric-content:after{
+	content: '';
+	display: block;
+	height: 20px;
 }
 
 i{
