@@ -24,13 +24,13 @@ export function setPlaylistSongs(songs) {
     playlist.songs = songs
 }
 
-export function playSongFromPlaylist() {
+export async function playSongFromPlaylist() {
     playlist.jumping = true
     playlist.currentIndex = 0
     playlist.playing = true
 }
 
-export function playSongFromPlaylistByIndex(index) {
+export async function playSongFromPlaylistByIndex(index) {
     playlist.jumping = false
     playlist.currentIndex = index
     playlist.playing = true

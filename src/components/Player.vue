@@ -38,7 +38,7 @@
 					<i class="fas fa-step-backward"></i>
 				</button>
 				<button class="play-btn" @click="togglePlay">
-					<i :class="isPlaying ? 'fas fa-pause' : 'fas fa-play'"></i>
+					<i :class="['fas', isPlaying ? 'fa-pause' : 'fa-play']"></i>
 				</button>
 				<button class="next-btn" @click="nextSong">
 					<i class="fas fa-step-forward"></i>
@@ -181,17 +181,6 @@
 				</div>
 			</div>
 		</div>
-
-		<!-- 上拉提示条 -->
-		<div
-			class="drawer-handle"
-			v-show="!showPlaylist"
-			@click="togglePlaylist"
-		>
-			<i class="fas fa-angle-up"></i>
-			<span>播放列表</span>
-			<span class="song-count">({{ playlist.songs.length }})</span>
-		</div>
 	</div>
 
 </template>
@@ -236,7 +225,8 @@ export default {
 				default: () => ({})
 			},
 			currentSongIndex: 0,
-			isWideScreen: true
+			isWideScreen: true,
+			isChanging: false,
 		}
 	},
 
@@ -255,14 +245,14 @@ export default {
 	},
 
 	methods: {
-		togglePlay() {
+		async togglePlay() {
 			if(this.playlist.songs.length === 0) return;
 
 			console.log(this.currentSong.id)
 
 			if ( !this.currentSong || this.currentSong.id === undefined || this.currentSong.id === 0){//Not Loaded
 				console.log("Playing first song in playlist")
-				this.playSong(0)
+				await this.playSong(0)
 				return;
 			}
 
@@ -271,7 +261,7 @@ export default {
 			if (this.isPlaying) {
 				this.$refs.audioRef.pause()
 			} else {
-				this.$refs.audioRef.play()
+				await this.$refs.audioRef.play()
 			}
 			this.isPlaying = !this.isPlaying
 		},
@@ -287,17 +277,53 @@ export default {
 			this.showPlaylist = !this.showPlaylist
 		},
 
-		playSong(index) {
-			// console.log(this);
-			this.currentSong = this.playlist.songs[index]
-			// if(!this.isPlaying){
-			// 	this.$refs.audioRef.play()
-			// }
-			// this.isPlaying = true
-			this.$refs.audioRef.currentTime = 0
-			this.currentSongIndex = index
-			playSongFromPlaylistByIndex(index)
-			// console.log("paused: ", this.$refs.audioRef.paused)
+		async changeSong(newSong) {
+			if(this.isChanging) return;
+			this.isChanging = true
+			try {
+				if (!newSong || newSong.id === undefined || newSong.id === '') {
+					return
+				}
+				if (newSong.audioUrl && newSong.audioUrl !== '') {
+					//Before playing the song, check if it is already playing.
+					console.log("Is playing?" , this.isPlaying)
+					if (!this.isPlaying) {
+						this.currentSong = newSong
+						console.log("Playing song", newSong)
+						await this.$refs.audioRef.load()
+						this.$refs.audioRef.currentTime = 0
+						await this.$refs.audioRef.play()
+						this.isPlaying = true
+					} else {
+						this.$refs.audioRef.pause()
+						this.currentSong = newSong
+						await this.$refs.audioRef.load()
+						this.$refs.audioRef.currentTime = 0
+						await this.$refs.audioRef.play()
+					}
+					//After this, the song should play.
+				}
+				this.isChanging = false
+			} catch (e) {
+				console.log("Error playing song inside change Song", e)
+				this.isChanging = false
+			}
+		},
+
+		async playSong(index) {
+			if (this.playlist.songs.length === 0) return
+			console.log("Playing song", this.playlist.songs[index])
+			await this.changeSong(this.playlist.songs[index]).catch(
+				e => {
+					console.log("Error playing song in Change Song", e)
+				}
+			)
+			try{
+				this.currentSongIndex = index
+				await playSongFromPlaylistByIndex(index)
+			}catch (e){
+				console.log("Error playing song", e)
+			}
 		},
 
 		removeSong(index) {
@@ -315,17 +341,25 @@ export default {
 			if (this.playlist.songs.length === 0) return
 
 			if(this.isPlaying){
-				this.$refs.audioRef.pause();
-				this.isPlaying = false
-				this.playlist.playing = false;
+				try {
+					this.$refs.audioRef.pause();
+					this.isPlaying = false
+					this.playlist.playing = false;
+				}catch (e){
+					console.log("Error pausing song", e)
+				}
 			}
 
 			if (this.playMode === 'random') {
 				this.currentSongIndex = Math.floor(Math.random() * this.playlist.songs.length)
 			} else if (this.playMode === 'single') {
 				this.isPlaying = true
-				this.$refs.audioRef.currentTime = 0
-				this.$refs.audioRef.play()
+				try {
+					this.$refs.audioRef.currentTime = 0
+					this.$refs.audioRef.play()
+				}catch (e){
+					console.log("Error playing song", e)
+				}
 				return;
 			} else {
 				this.currentSongIndex = this.currentSongIndex - 1
@@ -345,8 +379,13 @@ export default {
 				this.currentSongIndex = nextIndex
 			} else if (this.playMode === 'single') {
 				// 单曲循环，重新播放当前歌曲
-				this.$refs.audioRef.currentTime = 0
-				this.$refs.audioRef.play()
+				try {
+					this.$refs.audioRef.currentTime = 0
+					this.$refs.audioRef.play()
+				}catch (e){
+					console.log("Error playing song", e)
+				}
+				return;
 			} else {
 				// 列表循环
 				this.currentSongIndex = (this.currentSongIndex + 1) % this.playlist.songs.length
@@ -457,17 +496,23 @@ export default {
 			return `${minutes}:${seconds.toString().padStart(2, '0')}`
 		},
 
-		playAll(){
+		async playAll(){
 			this.currentSongIndex = 0
-			this.currentSong = this.playlist.songs[0]
+			await this.changeSong(this.playlist.songs[0]).catch(e => {
+				console.log("Error playing song", e)
+			})
 			this.isPlaying = true
 			this.playlist.playing = true
 			this.playlist.currentIndex = 0
 		},
 
-		resetCurrentSong(){
-			this.$refs.audioRef.pause()
-			this.currentSong = {
+		async resetCurrentSong(){
+			try {
+				this.$refs.audioRef.pause()
+			}catch (e){
+				console.log("Error pausing song", e)
+			}
+			const emptySong = {
 				id: 0,
 				name: '',
 				artist: '',
@@ -479,6 +524,7 @@ export default {
 				description: '',
 				createTime: ''
 			}
+			await this.changeSong(emptySong)
 			this.currentSongIndex = 0
 			this.isPlaying = false
 			this.duration = 0
@@ -499,45 +545,32 @@ export default {
 
 
 	watch: {
-		currentSong: {
-			handler(newSong) {
-				if(!newSong||newSong.id===undefined||newSong.id===''){
-					return
-				}
-				if (newSong.audioUrl && newSong.audioUrl !== '') {
-					this.$nextTick(() => {
-						try{
-							//Before playing the song, check if it is already playing.
-							if(!this.isPlaying){
-								this.$refs.audioRef.load()
-								this.$refs.audioRef.currentTime = 0
-								this.$refs.audioRef.play()
-								this.isPlaying = true
-							}else{
-								this.$refs.audioRef.pause()
-								this.$refs.audioRef.load()
-								this.$refs.audioRef.currentTime = 0
-								this.$refs.audioRef.play()
-							}
-							//After this, the song should play.
-						}catch (e){
-							console.log("Error playing song", e)
-						}
-					})
-				}
-			},
-			deep: true
-		},
+		// currentSong: {
+		// 	handler(newSong) {
+		// 		if(!newSong||newSong.id===undefined||newSong.id===''){
+		// 			return
+		// 		}
+		// 		if (newSong.audioUrl && newSong.audioUrl !== '') {
+		// 			this.$nextTick(() => {
+		// 				this.changeSong().catch(e => {
+		// 					console.log("Error playing song", e)
+		// 				})
+		// 			})
+		// 		}
+		// 	},
+		// 	deep: true,
+		// 	flush: "post"
+		// },
 		playlist:{
-			handler(newPlaylist){
+			async handler(newPlaylist){
 				console.log("Watched playlist change", newPlaylist)
 				this.playlist = newPlaylist
 				if(newPlaylist.jumping){
 					console.log("Playing song from playlist", newPlaylist.currentIndex)
-					this.playSong(newPlaylist.currentIndex);
+					await this.playSong(newPlaylist.currentIndex);
 				}
 			},
-			deep: true
+			deep: true,
 		}
 	},
 	mounted() {
@@ -646,6 +679,19 @@ export default {
 .play-btn {
 	font-size: 24px !important;
 	margin: 0 20px;
+}
+
+/* 播放按钮动画 */
+.play-btn i {
+	transition: transform 0.3s ease-in-out;
+}
+
+.play-btn i.fa-play {
+	transform: scale(1);
+}
+
+.play-btn i.fa-pause {
+	transform: scale(1.2);
 }
 
 .mode-btn {
@@ -1013,36 +1059,17 @@ export default {
 	margin-bottom: 16px;
 }
 
-.drawer-handle {
-	position: absolute;
-	top: -32px;
-	left: 0;
-	right: 0;
-	height: 32px;
-	background: var(--color-background);
-	border-top-right-radius: 12px;
-	border-top-left-radius: 12px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 8px;
-	cursor: pointer;
-	color: var(--color-text-secondary);
-	font-size: 14px;
-	transition: all 0.2s ease;
+i{
+	animation: change 0.2s forwards;
 }
 
-.drawer-handle:hover {
-	color: var(--color-primary);
-	background: var(--color-background-light);
-}
-
-.drawer-handle i {
-	transition: transform 0.2s ease;
-}
-
-.drawer-handle:hover i {
-	transform: translateY(-2px);
+@keyframes change {
+	0% {
+		transform: scale(0.8);
+	}
+	100% {
+		transform: scale(1);
+	}
 }
 
 /* 列表动画 */
