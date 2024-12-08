@@ -979,7 +979,7 @@ export default {
 .playlist-actions {
 	display: flex;
 	gap: 12px;
-	padding: 16px 20px;
+	padding: 4px 20px 16px;
 	background: var(--color-background-light);
 }
 
