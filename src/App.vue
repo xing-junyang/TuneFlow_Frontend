@@ -67,11 +67,24 @@ const showSideBar = computed(() => {
 	--sidebar-collapsed-padding: 8px;
 	--sidebar-collapsed-gap: 0;
 	--color-border: var(--color-text-secondary);
+	--drawer-height: 70vh;
 }
 
 @media screen and (max-width: 920px) {
 	:root {
 		--player-height: 120px;
+	}
+}
+
+@media screen and (max-width: 400px) {
+	.sidebar-box {
+		display: none;
+	}
+}
+
+@media screen and (max-height: 800px) {
+	:root {
+		--drawer-height: 60vh;
 	}
 }
 

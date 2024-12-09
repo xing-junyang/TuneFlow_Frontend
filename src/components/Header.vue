@@ -292,19 +292,19 @@
 			<button v-if="hasLogin && isAdmin" class="btn btn-login" @click="handleUploadSongList">
         <span class="btn-content">
           <span class="material-icons">music_note</span>
-          <span>上传音乐</span>
+          <span class="btn-text">上传音乐</span>
         </span>
 			</button>
 			<button v-if="!hasLogin" class="btn btn-login" @click="handleLogin">
         <span class="btn-content">
           <span class="material-icons">login</span>
-          <span>登录</span>
+          <span class="btn-text">登录</span>
         </span>
 			</button>
 			<button v-if="!hasLogin" class="btn btn-register" @click="handleRegister">
         <span class="btn-content">
           <span class="material-icons">person_add</span>
-          <span>注册</span>
+          <span class="btn-text">注册</span>
         </span>
 			</button>
 			<div v-if="hasLogin" class="user-info-container">
@@ -313,14 +313,14 @@
 			<button v-if="hasLogin" class="btn btn-login" @click="handleLogout">
         <span class="btn-content">
           <span class="material-icons">logout</span>
-          <span>登出</span>
+          <span class="btn-text">登出</span>
         </span>
 			</button>
 			<!-- 新增聊天按钮 -->
 			<button class="btn btn-chat" @click="openChat" v-if="hasLogin">
         <span class="btn-content">
           <span class="material-icons">chat</span>
-          <span>聊天</span>
+          <span class="btn-text">聊天</span>
         </span>
 			</button>
 		</div>
@@ -680,6 +680,21 @@ export default {
 	.modal-content {
 		width: 95%;
 	}
+
+	.btn-text{
+		display: none;
+	}
+
+	.user-info{
+		display: none;
+	}
+}
+
+@media screen and (max-width: 500px) {
+	.btn{
+		padding: 0.5rem 0.8rem;
+	}
+
 }
 
 @keyframes fade {

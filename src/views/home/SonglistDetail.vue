@@ -351,6 +351,8 @@ td {
 	text-align: start;
 }
 
+
+
 .song-title {
 	display: flex;
 	align-items: center;
@@ -429,6 +431,37 @@ td {
 
 	th:last-child,
 	td:last-child {
+		display: none;
+	}
+}
+
+@container song-list-detail (max-width: 600px) {
+	.album-cover {
+		width: 150px;
+		height: 150px;
+	}
+	th:nth-child(5), td:nth-child(5) {
+		display: none;
+	}
+	th:nth-child(2), td:nth-child(2) {
+		display: none;
+	}
+
+}
+
+@container song-list-detail (max-width: 400px) {
+	.album-cover {
+		width: 80px;
+		height:80px;
+	}
+	th:nth-child(4), td:nth-child(4) {
+		display: none;
+	}
+	.play-all-btn {
+		padding: 8px 16px;
+		font-size: 14px;
+	}
+	th{
 		display: none;
 	}
 }

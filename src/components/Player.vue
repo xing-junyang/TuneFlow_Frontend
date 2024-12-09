@@ -753,7 +753,7 @@ export default {
 
 .mode-btn {
 	font-size: 18px !important;
-	margin: 0 30px;
+	margin: 0 15px 0 30px;
 }
 
 .playlist-btn {
@@ -774,6 +774,10 @@ export default {
 }
 
 .lyric-btn:disabled{
+	color: #999;
+}
+
+.lyric-btn:disabled:hover{
 	color: #999;
 }
 
@@ -919,7 +923,7 @@ export default {
 }
 
 .playlist-content {
-	height: 70vh;
+	height: var(--drawer-height);
 	max-height: 600px;
 	display: flex;
 	flex-direction: column;
