@@ -1,4 +1,5 @@
 import { reactive } from 'vue'
+import {ElMessage} from "element-plus";
 /*
     song: {
 					id: Number,
@@ -39,6 +40,7 @@ export async function playSongFromPlaylistByIndex(index) {
 export function addSong(song) {
     playlist.jumping = false
     playlist.songs.push(song)
+    ElMessage.success('成功添加至播放列表')
 }
 
 export function addSongByDetail(id, name, artist, path, mark, description, createTime) {
