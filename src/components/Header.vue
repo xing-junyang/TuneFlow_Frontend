@@ -317,7 +317,7 @@
         </span>
 			</button>
 			<!-- 新增聊天按钮 -->
-			<button class="btn btn-chat" @click="openChat">
+			<button class="btn btn-chat" @click="openChat" v-if="hasLogin">
         <span class="btn-content">
           <span class="material-icons">chat</span>
           <span>聊天</span>
