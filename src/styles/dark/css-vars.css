@@ -5,7 +5,7 @@ html.dark {
   }
 
 .el-message{
-    background-color: rgba(255,255,255,0.1) !important;
+    background-color: rgba(25,25,25) !important;
     color: #fff !important;
     font-size: 16px !important;
     font-family: 'Noto Sans SC', sans-serif !important;
