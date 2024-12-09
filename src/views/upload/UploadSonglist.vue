@@ -179,7 +179,8 @@
 									:headers="uploadHeaders"
 									:on-success="handleSongAudioSuccess"
 									:on-error="handleUploadError"
-									:before-upload="beforeUpload"
+									:before-upload="beforeAudioUpload"
+									:on-remove="handleSongAudioRemove"
 								>
 									<template #trigger>
 										<button class="submit-btn">点击上传</button>
@@ -324,6 +325,10 @@ export default {
 			songAudioUrl.value = response.result
 		};
 
+		const handleSongAudioRemove = () => {
+			songAudioUrl.value = ''
+		}
+
 		const handleSongLyricSuccess = (response) => {
 			// 将上传的文件生成临时 URL，并绑定到 imageUrl
 			ElMessage.success('上传成功');
@@ -341,6 +346,31 @@ export default {
 				ElMessage.error('文件大小不能超过 50MB');
 				return false;
 			}
+			return true;
+		};
+
+		const beforeAudioUpload = (rawFile) => {
+			// 判断文件格式是否为 MP3
+			if (rawFile.type !== 'audio/mpeg') {
+				ElMessage.error('音频文件应该是 MP3 格式');
+				return false;
+			}
+			// 判断文件大小是否超过 50MB
+			if (rawFile.size / 1024 / 1024 > 50) {
+				ElMessage.error('音频文件大小不能超过 50MB');
+				return false;
+			}
+			const file_name = rawFile.name
+			//file name may be in this format: "Artist - Song Name.mp3" or "Artist-Song Name.mp3", so we can extract artist and song name from it
+			const artist_song = file_name.split('-')
+			if(artist_song.length < 2){
+				return true; //Do not automatically fill in artist and song name
+			}
+			const artist = artist_song[0].trim()
+			const song_name = artist_song[1].split('.')[0].trim()
+			console.log('Artist:', artist, 'Song:', song_name)
+			songArtist.value = artist
+			songName.value = song_name
 			return true;
 		};
 
@@ -380,9 +410,9 @@ export default {
 			})
 			// reset song form
 			songName.value = ''
-			songGenre.value = ''
-			songArtist.value = ''
-			songPictureUrl.value = ''
+			// songGenre.value = ''
+			// songArtist.value = ''
+			// songPictureUrl.value = ''
 			songDescription.value = ''
 			songAudioUrl.value = ''
 			songLyricUrl.value = ''
@@ -520,10 +550,12 @@ export default {
 			uploadSongPicture,
 			uploadSongs,
 			handleSongAudioSuccess,
+			handleSongAudioRemove,
 			handleSongPictureSuccess,
 			handleSongListPictureSuccess,
 			handleSongLyricSuccess,
 			beforeUpload,
+			beforeAudioUpload,
 			beforePictureUpload,
 			handleUploadError,
 			handleUploadSongList,
