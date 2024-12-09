@@ -72,7 +72,7 @@ const showSideBar = computed(() => {
 
 @media screen and (max-width: 920px) {
 	:root {
-		--player-height: 120px;
+		--player-height: 130px;
 	}
 }
 

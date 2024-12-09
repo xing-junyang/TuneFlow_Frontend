@@ -1211,7 +1211,7 @@ i{
 @media screen and (max-width: 920px) {
 	.player-bar {
 		padding: 0 10px;
-		height: 120px;
+		height: var(--player-height);
 		flex-direction: column;
 		justify-content: center;
 	}
@@ -1262,6 +1262,7 @@ i{
 
 	.progress-bar {
 		padding: 0 10px;
+		margin-bottom: 10px;
 	}
 
 	.time {
