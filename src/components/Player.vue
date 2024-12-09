@@ -1269,5 +1269,10 @@ i{
 		min-width: 35px;
 		font-size: 10px;
 	}
+
+	.song-name {
+		text-overflow: ellipsis;
+		max-width: 30vw;
+	}
 }
 </style>
