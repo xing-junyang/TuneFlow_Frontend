@@ -24,7 +24,6 @@
 	align-items: center;
 	justify-content: start;
 	padding-top: 20vh;
-	height: 20vh;
 	overflow: hidden;
 }
 .notlogin-home-title {
