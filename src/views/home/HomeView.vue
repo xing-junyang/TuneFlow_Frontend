@@ -15,9 +15,9 @@ export default {
 .home-view-container {
 	background-color: var(--color-background-page);
 	display: flex;
-	height: 100%;
-	margin-bottom: var(--player-height);
+	height: calc(100% - var(--player-height));
 	flex-direction: column;
+	overflow: auto;
 	//justify-content: center;
 }
 

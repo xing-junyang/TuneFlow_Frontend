@@ -194,13 +194,13 @@ onMounted(async () => {
 	container-type: inline-size;
 	container-name: song-list-detail;
 	display: flex;
-	height: 95%;
+	min-height: fit-content;
 	flex-direction: column;
 	align-items: start;
 	padding: 40px;
 	background-color: var(--color-background-page);
 	color: #ffffff;
-	overflow: auto;
+	//overflow: auto;
 	flex: 1;
 }
 

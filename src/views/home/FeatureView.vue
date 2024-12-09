@@ -192,13 +192,13 @@ onMounted(async () => {
 <style scoped>
 .feature-main-container {
 	display: flex;
-	height: 95%;
+	min-height: fit-content;
 	flex-direction: column;
 	align-items: start;
 	padding: 40px;
 	background-color: var(--color-background-page);
 	color: #ffffff;
-	overflow: auto;
+	//overflow: auto;
 	flex:1;
 }
 
