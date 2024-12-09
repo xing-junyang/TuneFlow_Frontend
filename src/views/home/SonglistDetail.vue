@@ -136,8 +136,8 @@ onMounted(async () => {
 				<div class="album-meta">
 					<span class="rating">★ {{ albumInfo?albumInfo.mark:5 }}</span>
 					<span class="separator">•</span>
-					<span class="date">{{ new Date(albumInfo?albumInfo.createTime:"1970").getFullYear() }}</span>
-					<span class="separator">•</span>
+					<span class="date" v-if="albumInfo && albumInfo.year">{{ albumInfo && albumInfo.year?albumInfo.year:"1970" }}</span>
+					<span class="separator" v-if="albumInfo && albumInfo.year">•</span>
 					<span class="songs-count">{{ albumInfo?albumInfo.songsId.length:0 }} 首歌曲</span>
 				</div>
 			</div>
