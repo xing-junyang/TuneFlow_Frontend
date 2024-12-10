@@ -405,4 +405,16 @@ input::placeholder {
 .cancel-btn .material-icons {
 	font-size: 1.2rem;
 }
+
+@keyframes inputPulse {
+	0% {
+		box-shadow: 0 0 0 0 rgba(29, 185, 84, 0.4);
+	}
+	70% {
+		box-shadow: 0 0 0 10px rgba(29, 185, 84, 0);
+	}
+	100% {
+		box-shadow: 0 0 0 0 rgba(29, 185, 84, 0);
+	}
+}
 </style>

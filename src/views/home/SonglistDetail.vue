@@ -6,6 +6,7 @@ import {getAlbum, getAlbumAllSongs} from "@/api/songlistApi";
 import {ElMessage} from "element-plus";
 import Loading from "@/components/Loading.vue";
 import AddSongToPlaylist from "@/components/management/AddSongToPlaylist.vue";
+import DeleteSongFromPlaylist from "@/components/management/DeleteSongFromPlaylist.vue";
 
 const route = useRoute();
 const isLoading = ref(false);
@@ -93,6 +94,15 @@ const addToPlayList = (index) => {
 	addSong(songs.value[index]);
 };
 
+const deleteSongModalVisible = ref(false);
+const deleteSongId = ref(0);
+const deleteSongName = ref('');
+const deleteFromPlayList = async (index) =>{
+	deleteSongId.value = songs.value[index].id;
+	deleteSongName.value = songs.value[index].name;
+	deleteSongModalVisible.value = true;
+};
+
 onMounted(async () => {
 	console.log('Song list detail view mounted');
 	isLoading.value = true;
@@ -176,13 +186,14 @@ onMounted(async () => {
 					<th>艺术家</th>
 					<th>流派</th>
 					<th>时长</th>
+					<th v-if="isAdmin"></th>
 				</tr>
 				</thead>
 				<tbody>
 				<tr v-for="(song, index) in songs" :key="song.id" class="song-row">
 					<td class="add-to-playlist-btn" @click="addToPlayList(index)">
 						<!--						add to playlist button-->
-						<span class="material-icons">playlist_add</span>
+						<i class="fa-solid fa-square-plus"></i>
 					</td>
 					<td @click="playSong(index)">{{ index + 1 }}</td>
 					<td class="song-title" @click="playSong(index)">
@@ -193,6 +204,10 @@ onMounted(async () => {
 					<td @click="playSong(index)">{{ song.genre }}</td>
 					<!-- 根据音频 URL获取时长 -->
 					<td @click="playSong(index)">{{ formatDuration(song.duration) }}</td>
+					<td v-if="isAdmin" class="add-to-playlist-btn" @click="deleteFromPlayList(index)">
+						<!--						add to playlist button-->
+						<i class="fa-solid fa-delete-left"></i>
+					</td>
 				</tr>
 				</tbody>
 			</table>
@@ -201,6 +216,9 @@ onMounted(async () => {
 
 		<!-- 添加歌曲弹窗 -->
 		<AddSongToPlaylist v-if="addSongModalVisible" @closeAddSongToPlaylist="addSongModalVisible = false" :songListId="Number(albumInfo.id)" />
+
+		<!-- 删除歌曲弹窗 -->
+		<DeleteSongFromPlaylist v-if="deleteSongModalVisible" @closeDeleteSongFromPlaylist="deleteSongModalVisible = false" :songListId="Number(albumInfo.id)" :songId="deleteSongId" :songName="deleteSongName" />
 	</div>
 </template>
 
@@ -352,6 +370,16 @@ th {
 .add-to-playlist-btn {
 	cursor: pointer;
 	width: 24px;
+	line-height: 100%;
+}
+
+.add-to-playlist-btn i{
+	font-size: 24px;
+	transition: color 0.5s ease;
+}
+
+.add-to-playlist-btn i:hover {
+	color: #1db954;
 }
 
 .song-row {
@@ -368,8 +396,6 @@ td {
 	border-bottom: 1px solid #333;
 	text-align: start;
 }
-
-
 
 .song-title {
 	display: flex;

@@ -79,6 +79,19 @@ export function addSongToAlbum(songListId, songId){
     return axios(config);
 }
 
+export function deleteSongFromAlbum(songListId, songId){
+    const config = {
+        method: 'post',
+        url: '/api/songlists/deleteSong/' + songListId + '/' + songId,
+        headers: {
+            'Content-Type': 'application/json',
+            'token': sessionStorage.getItem('token') == null? localStorage.getItem('token'): sessionStorage.getItem('token')
+        }
+    };
+
+    return axios(config);
+}
+
 export function deleteAlbum(id) {
     const config = {
         method: 'delete',
