@@ -48,3 +48,20 @@ export function register(name, phone, password) {
 
     return axios(config);
 }
+
+export function recordPlayHistory(songId){
+    if(songId == null){
+        return;
+    }
+
+    const config = {
+        method: 'post',
+        url: '/api/users/recordPlayHistory/' + songId,
+        headers: {
+            'Content-Type': 'application/json',
+            'token': sessionStorage.getItem('token') == null? localStorage.getItem('token'): sessionStorage.getItem('token')
+        }
+    };
+
+    return axios(config);
+}

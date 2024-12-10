@@ -217,6 +217,7 @@
 <script>
 import {clearPlaylist, playlist, playSongFromPlaylistByIndex} from "@/global/playlist";
 import Loading from "@/components/Loading.vue";
+import {recordPlayHistory} from "@/api/userApi";
 
 export default {
 	name: 'PlayerBar',
@@ -343,6 +344,10 @@ export default {
 					return
 				}
 				if (newSong.audioUrl && newSong.audioUrl !== '') {
+					//Record History
+					recordPlayHistory(newSong.id).catch(e => {
+						console.log("Error recording play history", e)
+					})
 					//Before playing the song, check if it is already playing.
 					console.log("Is playing?" , this.isPlaying)
 					if (!this.isPlaying) {
