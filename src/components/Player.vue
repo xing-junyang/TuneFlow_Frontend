@@ -3,7 +3,7 @@
 		<div class="player-left">
 			<div class="song-container">
 				<div class="song-cover">
-					<img :src="(currentSong.pictureUrl || 'https://discussions.apple.com/content/attachment/592590040')" alt="cover">
+					<img :src="(currentSong.pictureUrl || 'http://devops-server-song.oss-cn-nanjing.aliyuncs.com/c3c89d64-6709-4b01-bab8-ca01f1d6ac96_notplaying.jpg')" alt="cover">
 				</div>
 				<div class="song-info">
 					<div class="song-name">{{ currentSong.name || '未播放' }}</div>
@@ -581,7 +581,7 @@ export default {
 				name: '',
 				artist: '',
 				audioUrl: '',
-				pictureUrl: 'https://discussions.apple.com/content/attachment/592590040',
+				pictureUrl: 'http://devops-server-song.oss-cn-nanjing.aliyuncs.com/c3c89d64-6709-4b01-bab8-ca01f1d6ac96_notplaying.jpg',
 				genre: '',
 				lyricUrl: '',
 				mark: '',
