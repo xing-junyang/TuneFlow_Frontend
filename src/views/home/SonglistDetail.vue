@@ -169,7 +169,6 @@ onMounted(async () => {
 				</svg>
 				播放全部
 			</button>
-<!--			TODO: 添加歌曲按钮-->
 			<button class="play-all-btn" @click="addSongModalVisible = true" :disabled="isLoading" v-if="isAdmin">
 				添加歌曲
 			</button>
@@ -292,7 +291,6 @@ onMounted(async () => {
 	color: #1db954;
 	cursor: pointer;
 	font-size: 14px;
-	margin: 0 0 30px;
 	padding: 0;
 	text-align: start;
 	transition: color 0.5s ease;
@@ -307,6 +305,7 @@ onMounted(async () => {
 	align-items: center;
 	gap: 8px;
 	color: #b3b3b3;
+	margin-top: 30px;
 }
 
 .separator {
