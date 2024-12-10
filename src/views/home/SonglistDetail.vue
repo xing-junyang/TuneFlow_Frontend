@@ -5,6 +5,7 @@ import {setPlaylistSongs, playSongFromPlaylist, playlist, addSong} from "@/globa
 import {getAlbum, getAlbumAllSongs} from "@/api/songlistApi";
 import {ElMessage} from "element-plus";
 import Loading from "@/components/Loading.vue";
+import AddSongToPlaylist from "@/components/management/AddSongToPlaylist.vue";
 
 const route = useRoute();
 const isLoading = ref(false);
@@ -29,10 +30,17 @@ const shortenedDescription = computed(() => {
 	return albumInfo.value.description;
 });
 
+const isAdmin = computed( () => {
+	const userInfo = JSON.parse(sessionStorage.getItem('userInfo'))
+	// console.log(userInfo.role);
+	return userInfo && userInfo.role === 'Admin'
+})
+
+const addSongModalVisible = ref(false);
+
 const toggleCollapse = () => {
 	isCollapsed.value = !isCollapsed.value;
 };
-
 
 const formatDuration = (seconds) => {
 	const minutes = Math.floor(seconds / 60);
@@ -151,6 +159,10 @@ onMounted(async () => {
 				</svg>
 				播放全部
 			</button>
+<!--			TODO: 添加歌曲按钮-->
+			<button class="play-all-btn" @click="addSongModalVisible = true" :disabled="isLoading" v-if="isAdmin">
+				添加歌曲
+			</button>
 		</div>
 
 		<!-- 歌曲列表 -->
@@ -186,6 +198,9 @@ onMounted(async () => {
 			</table>
 		</div>
 		<Loading v-else />
+
+		<!-- 添加歌曲弹窗 -->
+		<AddSongToPlaylist v-if="addSongModalVisible" @closeAddSongToPlaylist="addSongModalVisible = false" :songListId="Number(albumInfo.id)" />
 	</div>
 </template>
 
@@ -283,6 +298,9 @@ onMounted(async () => {
 .controls {
 	margin-bottom: 32px;
 	width: 100%;
+	display: flex;
+	flex-direction: row;
+	gap: 16px;
 }
 
 .play-all-btn {

@@ -346,7 +346,7 @@
 import {computed, ref} from "vue";
 import {getUserName} from "@/utils";
 import router from "@/router";
-import Chat from "@/components/Chat.vue"; // 引入 Chat 组件
+import Chat from "@/components/Chat.vue";// 引入 Chat 组件
 
 export default {
 	name: 'HeaderComponent',
