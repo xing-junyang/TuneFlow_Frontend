@@ -366,6 +366,12 @@ export default {
 					}
 					await this.loadLyric()
 					//After this, the song should play.
+				} else if(newSong.pictureUrl === 'http://devops-server-song.oss-cn-nanjing.aliyuncs.com/c3c89d64-6709-4b01-bab8-ca01f1d6ac96_notplaying.jpg'){
+					if(this.isPlaying){
+						this.$refs.audioRef.pause()
+						this.isPlaying = false
+					}
+					this.currentSong = newSong
 				}
 				this.isChanging = false
 			} catch (e) {
