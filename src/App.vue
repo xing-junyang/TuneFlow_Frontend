@@ -13,11 +13,13 @@
 	</div>
 </template>
 <script setup>
-import { computed } from 'vue'
+import {computed, onMounted} from 'vue'
 import { useRoute } from 'vue-router'
 import HeaderComponent from "@/components/Header.vue"
 import PlayerBar from "@/components/Player.vue"
 import Sidebar from "@/components/SiderBar/feature/index.vue"
+import {getUserInfo} from "@/api/userApi";
+import {getUserName} from "@/utils";
 
 const route = useRoute()
 
@@ -27,6 +29,13 @@ const showPlayer = computed(() => {
 
 const showSideBar = computed(() => {
 	return !['login', 'register','upload_song_list'].includes(route.path.slice(1))
+})
+
+onMounted(() => {
+	getUserInfo().then(res => {
+		sessionStorage.setItem('userInfo', JSON.stringify(res.data.result))
+		getUserName();
+	})
 })
 </script>
 
