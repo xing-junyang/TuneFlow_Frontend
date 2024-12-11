@@ -1,9 +1,9 @@
 <script setup>
 
 import Modal from "@/components/Modal.vue";
-import {computed, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {ElMessage} from "element-plus";
-import {updateAlbumInformation} from "@/api/songlistApi";
+import {getAlbum, updateAlbumInformation} from "@/api/songlistApi";
 
 const props = defineProps({
 	songListId: Number
@@ -16,7 +16,7 @@ const songListArtistName = ref('')
 const songListYear = ref("2023")
 const isYearValid = computed(() => {
 	//check whether the input is number and a valid year
-	if(songListYear.value === ''){
+	if(songListYear.value === '' || songListYear.value === null){
 		return true
 	}
 	for (let i = 0; i < songListYear.value.length; i++) {
@@ -79,6 +79,21 @@ const handleUploadSongList = async () => {
 		ElMessage.error('更新歌单信息失败，请检查网络连接')
 	})
 }
+
+onMounted(async () => {
+	// 在这里执行初始化逻辑
+	console.log('EditSongList mounted');
+	getAlbum(props.songListId).then((res) => {
+		console.log('Album:', res.data.result);
+		songListName.value = res.data.result.name
+		songListDescription.value = res.data.result.description
+		songListPictureUrl.value = res.data.result.pictureUrl
+		songListArtistName.value = res.data.result.userName
+		songListYear.value = res.data.result.year
+	}).catch((err) => {
+		console.error('Failed to get album:', err);
+	});
+})
 
 </script>
 
