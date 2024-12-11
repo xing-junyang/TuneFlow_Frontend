@@ -146,7 +146,7 @@ onMounted(async () => {
 	<div class="song-list-detail-main-container">
 		<!-- 专辑头部信息 -->
 		<div class="album-header">
-			<img :src="albumInfo?albumInfo.pictureUrl:''" :alt="albumInfo?albumInfo.name:''" class="album-cover">
+			<img :src="albumInfo?albumInfo.pictureUrl:'http://devops-server-song.oss-cn-nanjing.aliyuncs.com/c3c89d64-6709-4b01-bab8-ca01f1d6ac96_notplaying.jpg'" :alt="albumInfo?albumInfo.name:''" class="album-cover">
 			<div class="album-info">
 				<div class="album-name">{{ albumInfo?albumInfo.name:'' }}</div>
 				<div class="album-artist-name">{{ albumInfo?albumInfo.userName:'' }}</div>

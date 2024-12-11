@@ -33,6 +33,8 @@ const showSideBar = computed(() => {
 onMounted(() => {
 	getUserInfo().then(res => {
 		sessionStorage.setItem('userInfo', JSON.stringify(res.data.result))
+	}).catch(err => {
+		console.error('Failed to get user info', err)
 	})
 })
 </script>

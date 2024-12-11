@@ -118,3 +118,17 @@ export function updateAlbumInformation(data) {
 
     return axios(config);
 }
+
+export function searchSongList(name) {
+    const config = {
+        method: 'get',
+        url: '/api/songlists/search',
+        headers: {
+            'Content-Type': 'application/json',
+            'token': sessionStorage.getItem('token') == null? localStorage.getItem('token'): sessionStorage.getItem('token')
+        },
+        params: { keyword: name },
+    };
+
+    return axios(config);
+}2

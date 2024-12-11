@@ -287,6 +287,9 @@
 				Tune Flow
 			</h1>
 		</div>
+		<div class="header-middle">
+			<SearchBar/>
+		</div>
 
 		<div class="header-right">
 			<button v-if="hasLogin && isAdmin" class="btn btn-login" @click="handleUploadSongList">
@@ -346,11 +349,14 @@
 import {computed, ref} from "vue";
 import {getUserName} from "@/utils";
 import router from "@/router";
-import Chat from "@/components/Chat.vue";// 引入 Chat 组件
+import Chat from "@/components/Chat.vue";
+import SearchBar from "@/components/SearchBar.vue";
+// 引入 Chat 组件
 
 export default {
 	name: 'HeaderComponent',
 	components: {
+		SearchBar,
 		Chat, // 注册 Chat 组件
 	},
 	methods: {
@@ -454,6 +460,10 @@ export default {
 .title .material-icons {
 	color: #1db954;
 	font-size: 1.8rem;
+}
+
+.header-middle{
+	flex: 1;
 }
 
 .user-info-container {
@@ -650,7 +660,8 @@ export default {
 	overflow-y: auto;
 }
 
-@media (max-width: 600px) {
+
+@media (max-width: 1000px) {
 	.header {
 		width: calc(100% - 2rem);
 		padding: 1rem;

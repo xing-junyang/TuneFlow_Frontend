@@ -9,13 +9,15 @@ import FeatureView from "@/views/home/FeatureView.vue";
 import SonglistDetail from "@/views/home/SonglistDetail.vue";
 import UploadSongList from "@/views/upload/UploadSonglist.vue";
 import NotLogin from "@/views/home/NotLogin.vue";
+import SearchResultView from "@/views/home/SearchResultView.vue";
 
 const routes = [
     {
         path: '/', component: HomeView, redirect: '/feature', children: [
             {path: '/feature', component: FeatureView},
             {path: '/song_list_detail/:song_list_id', name: 'SonglistDetail', component: SonglistDetail},
-            {path: '/not_login', component: NotLogin}
+            {path: '/not_login', component: NotLogin},
+            {path:'/search/:key_word', name: 'Search', component: SearchResultView}
         ]
     },
     {path: '/playlist', component: PlaylistView},
