@@ -713,6 +713,8 @@ export default {
 	font-size: 16px;
 	font-weight: 500;
 	margin-bottom: 4px;
+	max-width: 30vw;
+	text-overflow: ellipsis;
 }
 
 .song-artist {
