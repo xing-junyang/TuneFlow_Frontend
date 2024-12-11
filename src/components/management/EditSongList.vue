@@ -66,6 +66,8 @@ const handleUploadSongList = async () => {
 		userName: songListArtistName.value,
 		description: songListDescription.value,
 		pictureUrl: songListPictureUrl.value,
+		id: props.songListId,
+		year: songListYear.value
 	}
 	console.log(updateData)
 	updateAlbumInformation(updateData).then((res) => {
@@ -317,6 +319,15 @@ input::placeholder {
 
 .cancel-btn .material-icons {
 	font-size: 1.2rem;
+}
+
+.error-message{
+	display: block;
+	font-size: 0.8rem;
+	margin-top: 4px;
+	color: #ff4444;
+	transition: color 0.3s ease;
+	font-weight: bold;
 }
 
 @keyframes inputPulse {

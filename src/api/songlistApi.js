@@ -108,7 +108,7 @@ export function deleteAlbum(id) {
 export function updateAlbumInformation(data) {
     const config = {
         method: 'post',
-        url: '/api/songlists/updateAlbum',
+        url: '/api/songlists/updateAlbumInformation',
         headers: {
             'Content-Type': 'application/json',
             'token': sessionStorage.getItem('token') == null? localStorage.getItem('token'): sessionStorage.getItem('token')
