@@ -159,7 +159,7 @@
 							<span class="song-artist">{{ song.artist }}</span>
 						</div>
 
-<!--						<div class="song-actions">-->
+						<div class="song-actions">
 <!--							<button-->
 <!--								class="action-btn like-btn"-->
 <!--								:class="{ 'is-liked': song.isLiked }"-->
@@ -168,14 +168,14 @@
 <!--							>-->
 <!--								<i :class="song.isLiked ? 'fas fa-heart' : 'far fa-heart'"></i>-->
 <!--							</button>-->
-<!--							<button-->
-<!--								class="action-btn remove-btn"-->
-<!--								@click.stop="removeSong(index)"-->
-<!--								title="删除"-->
-<!--							>-->
-<!--								<i class="fas fa-times"></i>-->
-<!--							</button>-->
-<!--						</div>-->
+							<button
+								class="action-btn remove-btn"
+								@click.stop="removeSong(index)"
+								title="删除"
+							>
+								<i class="fa-solid fa-delete-left"></i>
+							</button>
+						</div>
 					</li>
 				</TransitionGroup>
 
@@ -215,7 +215,7 @@
 </template>
 
 <script>
-import {clearPlaylist, playlist, playSongFromPlaylistByIndex} from "@/global/playlist";
+import {clearPlaylist, playlist, playSongFromPlaylistByIndex, removeSong} from "@/global/playlist";
 import Loading from "@/components/Loading.vue";
 import {recordPlayHistory} from "@/api/userApi";
 
@@ -398,12 +398,13 @@ export default {
 
 		removeSong(index) {
 			// 从播放列表中移除歌曲
-			this.playlist.splice(index, 1)
+			removeSong(index)
 			if (index < this.currentSongIndex) {
 				this.currentSongIndex--
-			} else if (index === this.currentSongIndex) {
-				// 如果删除的是当前播放的歌曲，播放下一首
-				this.nextSong()
+			} else if (index === this.currentSongIndex && this.playlist.songs.length > 0) {
+				this.changeSong(this.playlist.songs[index])
+			} else if (index === this.currentSongIndex && this.playlist.songs.length === 0) {
+				this.resetCurrentSong()
 			}
 		},
 
@@ -764,12 +765,12 @@ export default {
 
 .mode-btn {
 	font-size: 18px !important;
-	margin: 0 15px 0 30px;
+	margin: 0 30px 0 30px;
 }
 
 .playlist-btn {
 	font-size: 18px !important;
-	margin: 0 0 0 15px;
+	margin: 0 0 0 20px;
 }
 
 .playlist-btn.active {
@@ -1011,7 +1012,7 @@ export default {
 
 .play-all-btn {
 	background: var(--color-primary);
-	border: 1px solid var(--color-border);
+	border: 1px solid var(--color-primary-dark);
 	color: white;
 }
 
@@ -1118,7 +1119,12 @@ export default {
 }
 
 .action-btn {
-	padding: 6px;
+	width: 30px;
+	height: 30px;
+	padding-right: 4px;
+	padding-left: 2px;
+	border-radius: 25%;
+	border: none;
 	color: var(--color-text-secondary);
 	transition: all 0.2s ease;
 }
