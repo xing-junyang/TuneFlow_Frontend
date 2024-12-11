@@ -5,8 +5,9 @@ import {setPlaylistSongs, playSongFromPlaylist, playlist, addSong} from "@/globa
 import {getAlbum, getAlbumAllSongs} from "@/api/songlistApi";
 import {ElMessage} from "element-plus";
 import Loading from "@/components/Loading.vue";
-import AddSongToPlaylist from "@/components/management/AddSongToPlaylist.vue";
-import DeleteSongFromPlaylist from "@/components/management/DeleteSongFromPlaylist.vue";
+import AddSongToSongList from "@/components/management/AddSongToSongList.vue";
+import DeleteSongFromSongList from "@/components/management/DeleteSongFromSongList.vue";
+import EditSongList from "@/components/management/EditSongList.vue";
 
 const route = useRoute();
 const isLoading = ref(false);
@@ -103,6 +104,8 @@ const deleteFromPlayList = async (index) =>{
 	deleteSongModalVisible.value = true;
 };
 
+const editSongListModalVisible = ref(false);
+
 onMounted(async () => {
 	console.log('Song list detail view mounted');
 	isLoading.value = true;
@@ -172,6 +175,9 @@ onMounted(async () => {
 			<button class="play-all-btn" @click="addSongModalVisible = true" :disabled="isLoading" v-if="isAdmin">
 				添加歌曲
 			</button>
+			<button class="edit-song-list-btn" @click="editSongListModalVisible = true" :disabled="isLoading" v-if="isAdmin">
+				编辑歌单
+			</button>
 		</div>
 
 		<!-- 歌曲列表 -->
@@ -214,10 +220,13 @@ onMounted(async () => {
 		<Loading v-else />
 
 		<!-- 添加歌曲弹窗 -->
-		<AddSongToPlaylist v-if="addSongModalVisible" @closeAddSongToPlaylist="addSongModalVisible = false" :songListId="Number(albumInfo.id)" />
+		<AddSongToSongList v-if="addSongModalVisible" @closeAddSongToSongList="addSongModalVisible = false" :songListId="Number(albumInfo.id)" />
 
 		<!-- 删除歌曲弹窗 -->
-		<DeleteSongFromPlaylist v-if="deleteSongModalVisible" @closeDeleteSongFromPlaylist="deleteSongModalVisible = false" :songListId="Number(albumInfo.id)" :songId="deleteSongId" :songName="deleteSongName" />
+		<DeleteSongFromSongList v-if="deleteSongModalVisible" @closeDeleteSongFromSongList="deleteSongModalVisible = false" :songListId="Number(albumInfo.id)" :songId="deleteSongId" :songName="deleteSongName" />
+
+		<EditSongList v-if="editSongListModalVisible" @closeEditSongList="editSongListModalVisible = false" :songListId="Number(albumInfo.id)" />
+
 	</div>
 </template>
 
@@ -345,6 +354,37 @@ onMounted(async () => {
 }
 
 .play-all-btn svg {
+	width: 24px;
+	height: 24px;
+}
+
+.edit-song-list-btn{
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	background-color: #000000;
+	border: white solid 2px;
+	border-radius: 24px;
+	color: white;
+	padding: 12px 32px;
+	font-size: 16px;
+	font-weight: bold;
+	cursor: pointer;
+	transition: all 0.5s ease;
+}
+
+.edit-song-list-btn:hover {
+	background-color: rgba(255, 255, 255, 0.25);
+}
+
+.edit-song-list-btn:disabled {
+	background-color: #000000;
+	color: #666666;
+	border: #666666 solid 2px;
+	cursor: not-allowed;
+}
+
+.edit-song-list-btn svg {
 	width: 24px;
 	height: 24px;
 }

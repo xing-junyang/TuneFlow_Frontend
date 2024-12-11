@@ -47,11 +47,11 @@ const handleAddSongConfirm =async () =>{
 </script>
 
 <template>
-	<Modal title="删除歌曲" @closeModal="$emit('closeDeleteSongFromPlaylist')">
+	<Modal title="删除歌曲" @closeModal="$emit('closeDeleteSongFromSongList')">
 		<div class="upload-form">
 			<div class="form-group" >
 				<label style="color: #ff4444">
-					即将从歌单中删除此歌曲，此操作不可逆！如果这一歌单是专辑，这首歌曲将无法访问。
+					即将从歌单中删除此歌曲，此操作不可逆！如果此歌单是一专辑，那么这首歌曲在其他地方也将无法访问。
 				</label>
 				<label>
 					请在下面输入"{{props.songName}}"以确认删除
@@ -65,7 +65,7 @@ const handleAddSongConfirm =async () =>{
 				确认删除
 			</button>
 
-			<button class="cancel-btn" @click="$emit('closeDeleteSongFromPlaylist')">
+			<button class="cancel-btn" @click="$emit('closeDeleteSongFromSongList')">
 				<span class="material-icons">cancel</span>
 				取消删除
 			</button>
@@ -111,8 +111,8 @@ input[type="number"] {
 
 input:focus {
 	outline: none;
-	border-color: #1db954;
-	box-shadow: 0 0 0 4px rgba(29, 185, 84, 0.1);
+	border-color: #ff0000;
+	box-shadow: 0 0 0 4px rgba(185, 29, 29, 0.1);
 	animation: inputPulse 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
@@ -191,13 +191,13 @@ input::placeholder {
 
 @keyframes inputPulse {
 	0% {
-		box-shadow: 0 0 0 0 rgba(29, 185, 84, 0.4);
+		box-shadow: 0 0 0 0 rgba(185, 29, 29, 0.4);
 	}
 	70% {
-		box-shadow: 0 0 0 10px rgba(29, 185, 84, 0);
+		box-shadow: 0 0 0 10px rgba(185, 29, 29, 0);
 	}
 	100% {
-		box-shadow: 0 0 0 0 rgba(29, 185, 84, 0);
+		box-shadow: 0 0 0 0 rgba(185, 29, 29, 0);
 	}
 }
 </style>

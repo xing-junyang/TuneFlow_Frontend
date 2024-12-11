@@ -104,3 +104,17 @@ export function deleteAlbum(id) {
 
     return axios(config);
 }
+
+export function updateAlbumInformation(data) {
+    const config = {
+        method: 'post',
+        url: '/api/songlists/updateAlbum',
+        headers: {
+            'Content-Type': 'application/json',
+            'token': sessionStorage.getItem('token') == null? localStorage.getItem('token'): sessionStorage.getItem('token')
+        },
+        data: data
+    };
+
+    return axios(config);
+}

@@ -108,12 +108,12 @@ const handleAddSongConfirm = async () => {
 		audioUrl: songAudioUrl.value,
 		lyricUrl: songLyricUrl.value
 	};
-	console.log("Adding song to playlist "+props.songListId+" with data: ", songData);
+	console.log("Adding song to song list "+props.songListId+" with data: ", songData);
 	await createSong(songData).then((res) => {
 		if(res.code === '000'){
 
 			const songId =  res.result
-			//Add song to playlist
+			//Add song to song list
 			addSongToAlbum(props.songListId, songId).then((res) => {
 				if(res.data.code === '000'){
 					ElMessage.success(songName.value + ' 已经成功添加')
@@ -139,7 +139,7 @@ const handleAddSongConfirm = async () => {
 </script>
 
 <template>
-	<Modal title="添加歌曲" @closeModal="$emit('closeAddSongToPlaylist')">
+	<Modal title="添加歌曲" @closeModal="$emit('closeAddSongToSongList')">
 		<div class="upload-form">
 			<div class="form-group">
 				<label>
@@ -243,7 +243,7 @@ const handleAddSongConfirm = async () => {
 				确认添加
 			</button>
 
-			<button class="cancel-btn" @click="$emit('closeAddSongToPlaylist')">
+			<button class="cancel-btn" @click="$emit('closeAddSongToSongList')">
 				<span class="material-icons">cancel</span>
 				取消添加
 			</button>
