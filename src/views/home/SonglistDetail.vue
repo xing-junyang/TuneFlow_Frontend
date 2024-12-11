@@ -218,15 +218,16 @@ onMounted(async () => {
 			</table>
 		</div>
 		<Loading v-else />
+		<!-- 添加歌曲弹窗 -->
+		<AddSongToSongList v-if="addSongModalVisible" @closeAddSongToSongList="addSongModalVisible = false" :songListId="Number(albumInfo.id)" />
+
+		<!-- 删除歌曲弹窗 -->
+		<DeleteSongFromSongList v-if="deleteSongModalVisible" @closeDeleteSongFromSongList="deleteSongModalVisible = false" :songListId="Number(albumInfo.id)" :songId="deleteSongId" :songName="deleteSongName" />
+
+		<!-- 编辑歌单弹窗 -->
+		<EditSongList v-if="editSongListModalVisible" @closeEditSongList="editSongListModalVisible = false" :songListId="Number(albumInfo.id)" />
 	</div>
-	<!-- 添加歌曲弹窗 -->
-	<AddSongToSongList v-if="addSongModalVisible" @closeAddSongToSongList="addSongModalVisible = false" :songListId="Number(albumInfo.id)" />
 
-	<!-- 删除歌曲弹窗 -->
-	<DeleteSongFromSongList v-if="deleteSongModalVisible" @closeDeleteSongFromSongList="deleteSongModalVisible = false" :songListId="Number(albumInfo.id)" :songId="deleteSongId" :songName="deleteSongName" />
-
-	<!-- 编辑歌单弹窗 -->
-	<EditSongList v-if="editSongListModalVisible" @closeEditSongList="editSongListModalVisible = false" :songListId="Number(albumInfo.id)" />
 </template>
 
 <style scoped>
