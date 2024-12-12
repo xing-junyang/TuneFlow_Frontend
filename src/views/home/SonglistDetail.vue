@@ -616,7 +616,7 @@ td {
 
 }
 
-@container song-list-detail (max-width: 400px) {
+@container song-list-detail (max-width: 450px) {
 	.album-cover {
 		width: 80px;
 		height:80px;
@@ -628,8 +628,20 @@ td {
 		padding: 8px 16px;
 		font-size: 14px;
 	}
+	.edit-song-list-btn {
+		padding: 8px 16px;
+		font-size: 14px;
+	}
+	.delete-song-list-btn {
+		padding: 8px 16px;
+		font-size: 14px;
+	}
 	th{
 		display: none;
+	}
+	.controls {
+		flex-direction: column;
+		gap: 16px;
 	}
 }
 

@@ -72,9 +72,9 @@ const handleClearSearch = () => {
 	}
 }
 
-@media (max-width: 600px) {
-	.search-bar {
-		display: none;
+@media (max-width: 550px) {
+	.search-bar input {
+		width: 80vw;
 	}
 }
 </style>
