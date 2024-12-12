@@ -8,6 +8,7 @@ import Loading from "@/components/Loading.vue";
 import AddSongToSongList from "@/components/management/AddSongToSongList.vue";
 import DeleteSongFromSongList from "@/components/management/DeleteSongFromSongList.vue";
 import EditSongList from "@/components/management/EditSongList.vue";
+import EditSong from "@/components/management/EditSong.vue";
 
 const route = useRoute();
 const isLoading = ref(false);
@@ -90,9 +91,31 @@ const playAll = () => {
 	playSongFromPlaylist();
 };
 
+const addAllToPlayList = () => {
+	console.log('Adding all to playlist');
+	try {
+		for (let i = 0; i < songs.value.length; i++) {
+			addSong(songs.value[i]);
+		}
+	} catch (e) {
+		console.error('Failed to add all songs to playlist:', e);
+		ElMessage.error('添加歌曲到播放列表失败');
+		return
+	}
+	ElMessage.success('已添加所有歌曲到播放列表');
+};
+
 const addToPlayList = (index) => {
 	console.log('Adding to playlist:', index);
-	addSong(songs.value[index]);
+	try{
+		addSong(songs.value[index]);
+	} catch (e) {
+		console.error('Failed to add song to playlist:', e);
+		ElMessage.error('添加歌曲到播放列表失败');
+		return
+	}
+
+	ElMessage.success('成功添加 '+ songs.value[index].name +' 至播放列表')
 };
 
 const deleteSongModalVisible = ref(false);
@@ -105,6 +128,13 @@ const deleteFromPlayList = async (index) =>{
 };
 
 const editSongListModalVisible = ref(false);
+
+const editSongModalVisible = ref(false);
+const editSongId = ref(0);
+const openEditSong = async (index) => {
+	editSongId.value = songs.value[index].id;
+	editSongModalVisible.value = true;
+};
 
 onMounted(async () => {
 	console.log('Song list detail view mounted');
@@ -178,6 +208,10 @@ onMounted(async () => {
 			<button class="edit-song-list-btn" @click="editSongListModalVisible = true" :disabled="isLoading" v-if="isAdmin">
 				编辑歌单
 			</button>
+			<button class="edit-song-list-btn" @click="addAllToPlayList" :disabled="isLoading">
+				<i class="fa-solid fa-square-plus"></i>
+				添加所有歌曲到播放列表
+			</button>
 		</div>
 
 		<!-- 歌曲列表 -->
@@ -191,6 +225,7 @@ onMounted(async () => {
 					<th>艺术家</th>
 					<th>流派</th>
 					<th>时长</th>
+					<th v-if="isAdmin"></th>
 					<th v-if="isAdmin"></th>
 				</tr>
 				</thead>
@@ -209,6 +244,11 @@ onMounted(async () => {
 					<td @click="playSong(index)">{{ song.genre }}</td>
 					<!-- 根据音频 URL获取时长 -->
 					<td @click="playSong(index)">{{ formatDuration(song.duration) }}</td>
+
+					<td v-if="isAdmin" class="add-to-playlist-btn" @click="openEditSong(index)">
+						<!--						add to playlist button-->
+						<i class="fa-solid fa-file-pen"></i>
+					</td>
 					<td v-if="isAdmin" class="add-to-playlist-btn" @click="deleteFromPlayList(index)">
 						<!--						add to playlist button-->
 						<i class="fa-solid fa-delete-left"></i>
@@ -226,6 +266,9 @@ onMounted(async () => {
 
 		<!-- 编辑歌单弹窗 -->
 		<EditSongList v-if="editSongListModalVisible" @closeEditSongList="editSongListModalVisible = false" :songListId="Number(albumInfo.id)" />
+
+		<!-- 编辑歌曲弹窗 -->
+		<EditSong v-if="editSongModalVisible" @closeEditSong="editSongModalVisible = false" :songId="editSongId" />
 	</div>
 
 </template>

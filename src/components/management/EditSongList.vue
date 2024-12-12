@@ -60,7 +60,6 @@ const beforePictureUpload = (rawFile) => {
 const handleUploadSongList = async () => {
 	// 上传歌单信息
 	console.log('上传歌单信息', props.songListId)
-	//TODO: upload song list information
 	const updateData = {
 		name: songListName.value,
 		userName: songListArtistName.value,

@@ -40,8 +40,6 @@ export async function playSongFromPlaylistByIndex(index) {
 export function addSong(song) {
     playlist.jumping = false
     playlist.songs.push(song)
-    const songName = song.name
-    ElMessage.success('成功添加 '+ songName +' 至播放列表')
 }
 
 export function removeSong(index) {
