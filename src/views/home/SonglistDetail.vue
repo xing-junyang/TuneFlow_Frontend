@@ -9,6 +9,7 @@ import AddSongToSongList from "@/components/management/AddSongToSongList.vue";
 import DeleteSongFromSongList from "@/components/management/DeleteSongFromSongList.vue";
 import EditSongList from "@/components/management/EditSongList.vue";
 import EditSong from "@/components/management/EditSong.vue";
+import DeleteSongList from "@/components/management/DeleteSongList.vue";
 
 const route = useRoute();
 const isLoading = ref(false);
@@ -136,6 +137,8 @@ const openEditSong = async (index) => {
 	editSongModalVisible.value = true;
 };
 
+const deleteSongListModalVisible = ref(false);
+
 onMounted(async () => {
 	console.log('Song list detail view mounted');
 	isLoading.value = true;
@@ -202,15 +205,19 @@ onMounted(async () => {
 				</svg>
 				播放全部
 			</button>
-			<button class="play-all-btn" @click="addSongModalVisible = true" :disabled="isLoading" v-if="isAdmin">
+			<button class="edit-song-list-btn" @click="addAllToPlayList" :disabled="isLoading">
+				<i class="fa-solid fa-square-plus"></i>
+				添加所有歌曲到播放列表
+			</button>
+			<button class="edit-song-list-btn" @click="addSongModalVisible = true" :disabled="isLoading" v-if="isAdmin">
 				添加歌曲
 			</button>
 			<button class="edit-song-list-btn" @click="editSongListModalVisible = true" :disabled="isLoading" v-if="isAdmin">
 				编辑歌单
 			</button>
-			<button class="edit-song-list-btn" @click="addAllToPlayList" :disabled="isLoading">
-				<i class="fa-solid fa-square-plus"></i>
-				添加所有歌曲到播放列表
+			<button class="delete-song-list-btn" @click="deleteSongListModalVisible = true" :disabled="isLoading" v-if="isAdmin">
+				<i class="fa-solid fa-delete-left"></i>
+				删除歌单
 			</button>
 		</div>
 
@@ -269,6 +276,9 @@ onMounted(async () => {
 
 		<!-- 编辑歌曲弹窗 -->
 		<EditSong v-if="editSongModalVisible" @closeEditSong="editSongModalVisible = false" :songId="editSongId" />
+
+		<!-- 删除歌单弹窗 -->
+		<DeleteSongList v-if="deleteSongListModalVisible" @closeDeleteSongList="deleteSongListModalVisible = false" :songListId="Number(albumInfo.id)" :songListName="albumInfo?albumInfo.name:''" />
 	</div>
 
 </template>
@@ -428,6 +438,37 @@ onMounted(async () => {
 }
 
 .edit-song-list-btn svg {
+	width: 24px;
+	height: 24px;
+}
+
+.delete-song-list-btn{
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	background-color: #880000;
+	border: none;
+	border-radius: 24px;
+	color: white;
+	padding: 12px 32px;
+	font-size: 16px;
+	font-weight: bold;
+	cursor: pointer;
+	transition: all 0.5s ease;
+}
+
+.delete-song-list-btn:hover {
+	background-color: #ff4444;
+
+}
+
+.delete-song-list-btn:disabled {
+	background-color: #666;
+	border: none;
+	cursor: not-allowed;
+}
+
+.delete-song-list-btn svg {
 	width: 24px;
 	height: 24px;
 }
