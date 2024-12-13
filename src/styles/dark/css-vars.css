@@ -2,6 +2,8 @@
 html.dark {
     /* 自定义深色背景颜色 */
     --el-box-shadow-light: none;
+    height: 100vh;
+    height: -webkit-fill-available;
   }
 
 .el-message{
@@ -15,4 +17,10 @@ html.dark {
     box-shadow: 0 0 10px rgba(255,255,255,0.1) !important;
     padding-left: 24px;
     padding-right: 24px;
+}
+
+@supports (-webkit-touch-callout: none) {
+    html {
+        height: -webkit-fill-available;
+    }
 }

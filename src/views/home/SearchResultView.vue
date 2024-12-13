@@ -1,13 +1,44 @@
 <script setup>
-import {onMounted, ref} from 'vue';
-import router from "@/router";
-import {getAlbumAllSongs, getAlbums} from "@/api/songlistApi";
-import {ElMessage} from "element-plus";
 import Loading from "@/components/Loading.vue";
+import {useRoute} from "vue-router";
+import {onMounted, ref, watch} from "vue";
+import router from "@/router";
+import {getAlbumAllSongs, searchSongList} from "@/api/songlistApi";
 import {playSongFromPlaylist, setPlaylistSongs} from "@/global/playlist";
+import {ElMessage} from "element-plus";
+import NoItem from "@/components/NoItem.vue";
 
+const route = useRoute();
+const searchKeyword = ref(route.params.key_word);
 const albums = ref([]);
 const isLoading = ref(false);
+
+onMounted(async () => {
+	// 在这里执行初始化逻辑
+	console.log('SearchResultView mounted');
+	isLoading.value = true;
+	await searchSongList(searchKeyword.value).then((res) => {
+		console.log('Search result:', res.data.result);
+		albums.value = res.data.result;
+	}).catch((err) => {
+		console.error('Failed to search albums:', err);
+		ElMessage.error('搜索专辑失败，您可能没有互联网连接');
+	});
+	isLoading.value = false;
+});
+
+watch(() => route.params.key_word, async (newkey) => {
+	searchKeyword.value = newkey;
+	isLoading.value = true;
+	await searchSongList(newkey).then((res) => {
+		console.log('Search result:', res.data.result);
+		albums.value = res.data.result;
+	}).catch((err) => {
+		console.error('Failed to search albums:', err);
+		ElMessage.error('搜索专辑失败，您可能没有互联网连接');
+	});
+	isLoading.value = false;
+})
 
 const navigateToAlbum = (albumId) => {
 	// 导航到专辑详情页面的逻辑
@@ -31,30 +62,16 @@ const playAlbum = async (albumId) => {
 	});
 };
 
-onMounted(async () => {
-	// 在这里执行初始化逻辑
-	console.log('FeatureView mounted');
-	isLoading.value = true;
-	await getAlbums().then((res) => {
-		console.log('Albums:', res.data.result);
-		albums.value = res.data.result;
-	}).catch((err) => {
-		console.error('Failed to get albums:', err);
-		ElMessage.error('获取推荐专辑失败，您可能没有互联网连接');
-	});
-	isLoading.value = false;
-});
 </script>
-
 <template>
-	<div class="feature-main-container">
-		<div class="feature-title">为你推荐</div>
+	<div class="search-main-container">
+		<div class="search-title">"{{searchKeyword}}" 的搜索结果</div>
 
 		<div class="albums-grid" v-if="!isLoading">
 			<div v-for="album in albums" :key="album.id" class="album-card">
 				<div class="album-cover">
 					<div class="album-image" @click="navigateToAlbum(album.id)">
-<!--						Display album image-->
+						<!--						Display album image-->
 						<img :src="album.pictureUrl" :alt="album.name" class="album-image" />
 					</div>
 					<div class="play-button" @click="playAlbum(album.id)">
@@ -70,11 +87,12 @@ onMounted(async () => {
 			</div>
 		</div>
 		<Loading v-else />
+		<NoItem v-if="albums.length === 0 && !isLoading" />
 	</div>
 </template>
 
 <style scoped>
-.feature-main-container {
+.search-main-container {
 	display: flex;
 	min-height: fit-content;
 	flex-direction: column;
@@ -82,10 +100,11 @@ onMounted(async () => {
 	padding: 40px;
 	background-color: var(--color-background-page);
 	color: #ffffff;
+	//overflow: auto;
 	flex:1;
 }
 
-.feature-title {
+.search-title {
 	font-size: 36px;
 	font-weight: bold;
 	color: var(--color-text);
@@ -177,7 +196,7 @@ onMounted(async () => {
 }
 
 @media (max-width: 820px) {
-	.feature-main-container {
+	.search-main-container {
 		padding: 20px;
 	}
 
@@ -186,7 +205,7 @@ onMounted(async () => {
 		gap: 16px;
 	}
 
-	.feature-title {
+	.search-title {
 		font-size: 28px;
 		margin-bottom: 24px;
 	}

@@ -72,3 +72,20 @@ export function deleteSong(songId) {
         method: 'delete'
     })
 }
+
+// 获取歌曲
+export function getSong(songId) {
+    return request({
+        url: `/api/songs/getSong/${songId}`,
+        method: 'get'
+    })
+}
+
+// 更新歌曲
+export function updateSong(songId, data) {
+    return request({
+        url: `/api/songs/updateInformation/${songId}`,
+        method: 'post',
+        data
+    })
+}

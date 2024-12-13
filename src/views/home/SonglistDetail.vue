@@ -5,8 +5,11 @@ import {setPlaylistSongs, playSongFromPlaylist, playlist, addSong} from "@/globa
 import {getAlbum, getAlbumAllSongs} from "@/api/songlistApi";
 import {ElMessage} from "element-plus";
 import Loading from "@/components/Loading.vue";
-import AddSongToPlaylist from "@/components/management/AddSongToPlaylist.vue";
-import DeleteSongFromPlaylist from "@/components/management/DeleteSongFromPlaylist.vue";
+import AddSongToSongList from "@/components/management/AddSongToSongList.vue";
+import DeleteSongFromSongList from "@/components/management/DeleteSongFromSongList.vue";
+import EditSongList from "@/components/management/EditSongList.vue";
+import EditSong from "@/components/management/EditSong.vue";
+import DeleteSongList from "@/components/management/DeleteSongList.vue";
 
 const route = useRoute();
 const isLoading = ref(false);
@@ -89,9 +92,31 @@ const playAll = () => {
 	playSongFromPlaylist();
 };
 
+const addAllToPlayList = () => {
+	console.log('Adding all to playlist');
+	try {
+		for (let i = 0; i < songs.value.length; i++) {
+			addSong(songs.value[i]);
+		}
+	} catch (e) {
+		console.error('Failed to add all songs to playlist:', e);
+		ElMessage.error('添加歌曲到播放列表失败');
+		return
+	}
+	ElMessage.success('已添加所有歌曲到播放列表');
+};
+
 const addToPlayList = (index) => {
 	console.log('Adding to playlist:', index);
-	addSong(songs.value[index]);
+	try{
+		addSong(songs.value[index]);
+	} catch (e) {
+		console.error('Failed to add song to playlist:', e);
+		ElMessage.error('添加歌曲到播放列表失败');
+		return
+	}
+
+	ElMessage.success('成功添加 '+ songs.value[index].name +' 至播放列表')
 };
 
 const deleteSongModalVisible = ref(false);
@@ -102,6 +127,17 @@ const deleteFromPlayList = async (index) =>{
 	deleteSongName.value = songs.value[index].name;
 	deleteSongModalVisible.value = true;
 };
+
+const editSongListModalVisible = ref(false);
+
+const editSongModalVisible = ref(false);
+const editSongId = ref(0);
+const openEditSong = async (index) => {
+	editSongId.value = songs.value[index].id;
+	editSongModalVisible.value = true;
+};
+
+const deleteSongListModalVisible = ref(false);
 
 onMounted(async () => {
 	console.log('Song list detail view mounted');
@@ -143,7 +179,7 @@ onMounted(async () => {
 	<div class="song-list-detail-main-container">
 		<!-- 专辑头部信息 -->
 		<div class="album-header">
-			<img :src="albumInfo?albumInfo.pictureUrl:''" :alt="albumInfo?albumInfo.name:''" class="album-cover">
+			<img :src="albumInfo?albumInfo.pictureUrl:'http://devops-server-song.oss-cn-nanjing.aliyuncs.com/c3c89d64-6709-4b01-bab8-ca01f1d6ac96_notplaying.jpg'" :alt="albumInfo?albumInfo.name:''" class="album-cover">
 			<div class="album-info">
 				<div class="album-name">{{ albumInfo?albumInfo.name:'' }}</div>
 				<div class="album-artist-name">{{ albumInfo?albumInfo.userName:'' }}</div>
@@ -169,8 +205,19 @@ onMounted(async () => {
 				</svg>
 				播放全部
 			</button>
-			<button class="play-all-btn" @click="addSongModalVisible = true" :disabled="isLoading" v-if="isAdmin">
+			<button class="edit-song-list-btn" @click="addAllToPlayList" :disabled="isLoading">
+				<i class="fa-solid fa-square-plus"></i>
+				添加所有歌曲到播放列表
+			</button>
+			<button class="edit-song-list-btn" @click="addSongModalVisible = true" :disabled="isLoading" v-if="isAdmin">
 				添加歌曲
+			</button>
+			<button class="edit-song-list-btn" @click="editSongListModalVisible = true" :disabled="isLoading" v-if="isAdmin">
+				编辑歌单
+			</button>
+			<button class="delete-song-list-btn" @click="deleteSongListModalVisible = true" :disabled="isLoading" v-if="isAdmin">
+				<i class="fa-solid fa-delete-left"></i>
+				删除歌单
 			</button>
 		</div>
 
@@ -185,6 +232,7 @@ onMounted(async () => {
 					<th>艺术家</th>
 					<th>流派</th>
 					<th>时长</th>
+					<th v-if="isAdmin"></th>
 					<th v-if="isAdmin"></th>
 				</tr>
 				</thead>
@@ -203,6 +251,11 @@ onMounted(async () => {
 					<td @click="playSong(index)">{{ song.genre }}</td>
 					<!-- 根据音频 URL获取时长 -->
 					<td @click="playSong(index)">{{ formatDuration(song.duration) }}</td>
+
+					<td v-if="isAdmin" class="add-to-playlist-btn" @click="openEditSong(index)">
+						<!--						add to playlist button-->
+						<i class="fa-solid fa-file-pen"></i>
+					</td>
 					<td v-if="isAdmin" class="add-to-playlist-btn" @click="deleteFromPlayList(index)">
 						<!--						add to playlist button-->
 						<i class="fa-solid fa-delete-left"></i>
@@ -212,13 +265,22 @@ onMounted(async () => {
 			</table>
 		</div>
 		<Loading v-else />
-
 		<!-- 添加歌曲弹窗 -->
-		<AddSongToPlaylist v-if="addSongModalVisible" @closeAddSongToPlaylist="addSongModalVisible = false" :songListId="Number(albumInfo.id)" />
+		<AddSongToSongList v-if="addSongModalVisible" @closeAddSongToSongList="addSongModalVisible = false" :songListId="Number(albumInfo.id)" />
 
 		<!-- 删除歌曲弹窗 -->
-		<DeleteSongFromPlaylist v-if="deleteSongModalVisible" @closeDeleteSongFromPlaylist="deleteSongModalVisible = false" :songListId="Number(albumInfo.id)" :songId="deleteSongId" :songName="deleteSongName" />
+		<DeleteSongFromSongList v-if="deleteSongModalVisible" @closeDeleteSongFromSongList="deleteSongModalVisible = false" :songListId="Number(albumInfo.id)" :songId="deleteSongId" :songName="deleteSongName" />
+
+		<!-- 编辑歌单弹窗 -->
+		<EditSongList v-if="editSongListModalVisible" @closeEditSongList="editSongListModalVisible = false" :songListId="Number(albumInfo.id)" />
+
+		<!-- 编辑歌曲弹窗 -->
+		<EditSong v-if="editSongModalVisible" @closeEditSong="editSongModalVisible = false" :songId="editSongId" />
+
+		<!-- 删除歌单弹窗 -->
+		<DeleteSongList v-if="deleteSongListModalVisible" @closeDeleteSongList="deleteSongListModalVisible = false" :songListId="Number(albumInfo.id)" :songListName="albumInfo?albumInfo.name:''" />
 	</div>
+
 </template>
 
 <style scoped>
@@ -232,7 +294,6 @@ onMounted(async () => {
 	padding: 40px;
 	background-color: var(--color-background-page);
 	color: #ffffff;
-	//overflow: auto;
 	flex: 1;
 }
 
@@ -345,6 +406,68 @@ onMounted(async () => {
 }
 
 .play-all-btn svg {
+	width: 24px;
+	height: 24px;
+}
+
+.edit-song-list-btn{
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	background-color: #000000;
+	border: white solid 2px;
+	border-radius: 24px;
+	color: white;
+	padding: 12px 32px;
+	font-size: 16px;
+	font-weight: bold;
+	cursor: pointer;
+	transition: all 0.5s ease;
+}
+
+.edit-song-list-btn:hover {
+	background-color: rgba(255, 255, 255, 0.25);
+}
+
+.edit-song-list-btn:disabled {
+	background-color: #000000;
+	color: #666666;
+	border: #666666 solid 2px;
+	cursor: not-allowed;
+}
+
+.edit-song-list-btn svg {
+	width: 24px;
+	height: 24px;
+}
+
+.delete-song-list-btn{
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	background-color: #880000;
+	border: none;
+	border-radius: 24px;
+	color: white;
+	padding: 12px 32px;
+	font-size: 16px;
+	font-weight: bold;
+	cursor: pointer;
+	transition: all 0.5s ease;
+}
+
+.delete-song-list-btn:hover {
+	background-color: #ff4444;
+
+}
+
+.delete-song-list-btn:disabled {
+	background-color: #666;
+	border: none;
+	cursor: not-allowed;
+}
+
+.delete-song-list-btn svg {
 	width: 24px;
 	height: 24px;
 }
@@ -492,7 +615,7 @@ td {
 
 }
 
-@container song-list-detail (max-width: 400px) {
+@container song-list-detail (max-width: 450px) {
 	.album-cover {
 		width: 80px;
 		height:80px;
@@ -504,8 +627,20 @@ td {
 		padding: 8px 16px;
 		font-size: 14px;
 	}
+	.edit-song-list-btn {
+		padding: 8px 16px;
+		font-size: 14px;
+	}
+	.delete-song-list-btn {
+		padding: 8px 16px;
+		font-size: 14px;
+	}
 	th{
 		display: none;
+	}
+	.controls {
+		flex-direction: column;
+		gap: 16px;
 	}
 }
 

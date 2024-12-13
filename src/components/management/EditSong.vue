@@ -1,14 +1,36 @@
 <script setup>
-// 添加歌曲表单数据
-import {ElMessage} from "element-plus";
-import {computed, ref} from "vue";
+
 import Modal from "@/components/Modal.vue";
-import {createSong, deleteSong} from "@/api/songApi";
-import {addSongToAlbum} from "@/api/songlistApi";
+import {computed, onMounted, ref} from "vue";
+import {ElMessage} from "element-plus";
+import {getSong, updateSong} from "@/api/songApi";
 
 const props = defineProps({
-	songListId: Number
+	songId: Number,
 })
+
+const handleEditSongConfirm = () => {
+	console.log('编辑歌曲:', props.songId)
+	const updateData = {
+		name: songName.value,
+		genre: songGenre.value,
+		artist: songArtist.value,
+		description: songDescription.value,
+		pictureUrl: songPictureUrl.value,
+		audioUrl: songAudioUrl.value,
+		lyricUrl: songLyricUrl.value
+	}
+	updateSong(props.songId, updateData).then((res) => {
+		if(res.code === '000'){
+			ElMessage.success('成功修改歌曲信息')
+		}else{
+			ElMessage.error('修改歌曲信息失败')
+		}
+	}).catch((err) => {
+		console.error('Failed to update song:', err)
+		ElMessage.error('修改歌曲信息失败，请检查网络连接')
+	})
+}
 
 const songName = ref('');
 const songGenre = ref('');
@@ -23,6 +45,7 @@ const isUploadSongFormValid = computed(() => {
 const uploadHeaders = {
 	token:  sessionStorage.getItem('token')
 };
+
 const handleSongAudioSuccess = (response) => {
 	// 将上传的文件生成临时 URL，并绑定到 imageUrl
 	ElMessage.success('上传成功');
@@ -98,48 +121,27 @@ const beforePictureUpload = (rawFile) => {
 	return true;
 };
 
-const handleAddSongConfirm = async () => {
-	const songData = {
-		name: songName.value,
-		genre: songGenre.value,
-		artist: songArtist.value,
-		description: songDescription.value,
-		pictureUrl: songPictureUrl.value,
-		audioUrl: songAudioUrl.value,
-		lyricUrl: songLyricUrl.value
-	};
-	console.log("Adding song to playlist "+props.songListId+" with data: ", songData);
-	await createSong(songData).then((res) => {
-		if(res.code === '000'){
 
-			const songId =  res.result
-			//Add song to playlist
-			addSongToAlbum(props.songListId, songId).then((res) => {
-				if(res.data.code === '000'){
-					ElMessage.success(songName.value + ' 已经成功添加')
-					return 0;
-				}else{
-					ElMessage.error('添加歌曲到歌单失败')
-					deleteSong(songId)
-					return -1;
-				}
-			}).catch((err) => {
-				console.error('Failed to add song to album:', err)
-				ElMessage.error('添加歌曲到歌单失败，请检查网络连接')
-				return -2;
-			})
-		}else{
-			ElMessage.error('上传歌曲 ' + songName.value + ' 失败')
-		}
+
+onMounted(async () => {
+	// 在这里执行初始化逻辑
+	console.log('EditSong mounted');
+	getSong(props.songId).then((res) => {
+		songName.value = res.result.name
+		songGenre.value = res.result.genre
+		songArtist.value = res.result.artist
+		songDescription.value = res.result.description
+		songPictureUrl.value = res.result.pictureUrl
+		songAudioUrl.value = res.result.audioUrl
+		songLyricUrl.value = res.result.lyricUrl
 	}).catch((err) => {
-		console.error('Failed to create song:', err)
-		ElMessage.error('上传歌曲失败，请检查网络连接')
-	})
-}
+		console.error('Failed to get song:', err);
+	});
+})
 </script>
 
 <template>
-	<Modal title="添加歌曲" @closeModal="$emit('closeAddSongToPlaylist')">
+	<Modal title="修改歌曲信息" @closeModal="$emit('closeEditSong')">
 		<div class="upload-form">
 			<div class="form-group">
 				<label>
@@ -238,12 +240,12 @@ const handleAddSongConfirm = async () => {
 				</div>
 			</div>
 			<!--				:disabled="!isUploadSongFormValid"-->
-			<button class="submit-btn" @click="handleAddSongConfirm" :disabled="!isUploadSongFormValid">
+			<button class="submit-btn" @click="handleEditSongConfirm" :disabled="!isUploadSongFormValid">
 				<span class="material-icons">upload</span>
 				确认添加
 			</button>
 
-			<button class="cancel-btn" @click="$emit('closeAddSongToPlaylist')">
+			<button class="cancel-btn" @click="$emit('closeEditSong')">
 				<span class="material-icons">cancel</span>
 				取消添加
 			</button>

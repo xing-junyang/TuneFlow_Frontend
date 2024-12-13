@@ -104,3 +104,31 @@ export function deleteAlbum(id) {
 
     return axios(config);
 }
+
+export function updateAlbumInformation(data) {
+    const config = {
+        method: 'post',
+        url: '/api/songlists/updateAlbumInformation',
+        headers: {
+            'Content-Type': 'application/json',
+            'token': sessionStorage.getItem('token') == null? localStorage.getItem('token'): sessionStorage.getItem('token')
+        },
+        data: data
+    };
+
+    return axios(config);
+}
+
+export function searchSongList(name) {
+    const config = {
+        method: 'get',
+        url: '/api/songlists/search',
+        headers: {
+            'Content-Type': 'application/json',
+            'token': sessionStorage.getItem('token') == null? localStorage.getItem('token'): sessionStorage.getItem('token')
+        },
+        params: { keyword: name },
+    };
+
+    return axios(config);
+}2
