@@ -924,7 +924,7 @@ export default {
 	transform: translateY(100%);
 	opacity: 0;
 	transition: all 0.5s ease;
-	z-index: 1 !important;
+	z-index: 999 !important;
 	border-top-right-radius: 12px;
 	border-top-left-radius: 12px;
 	box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
@@ -1157,12 +1157,14 @@ export default {
 .lyric-container {
 	flex: 1;
 	overflow: scroll;
+	overscroll-behavior: none;
 	position: relative;
 }
 
 
 .song-lyric{
 	overflow: scroll;
+	overscroll-behavior: none;
 	display: flex;
 	overflow-y: auto;
 	height: 100%;

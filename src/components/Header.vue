@@ -157,7 +157,7 @@ export default {
 	top: 0;
 	left: 0;
 	width: calc(100% - 4rem);
-	z-index: 1000;
+	z-index: 500;
 	display: flex;
 	flex-direction: column;
 	gap: 20px;
