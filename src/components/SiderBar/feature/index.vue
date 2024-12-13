@@ -35,7 +35,7 @@
                         v-for="(playlist, index) in songList" :key="playlist.id" :index="index"
                         :collapsed="!isExpanded" @click="handlePlay(playlist)">
                         <template #expanded>
-                            <PlaylistItemExpanded :playlist="playlist" @play="handlePlay" />
+                            <PlaylistItemExpanded :playlist  ="playlist" @play="handlePlay" />
                         </template>
 
                         <template #collapsed>
@@ -56,7 +56,6 @@
         </SidebarFooter>
     </SidebarRoot>
 
-    <!-- 添加编辑对话框 -->
     <el-dialog
         v-model="dialogVisible"
         title="编辑歌单"
@@ -245,7 +244,8 @@ const handleSubmit = async () => {
         if (valid) {
             try {
                 const res = await updateSongList(editForm)
-                if (res.code === '200') {
+              console.log(res)
+                if (res.data.code === '000') {
                     ElMessage.success('更新成功')
                     dialogVisible.value = false
                     // 刷新列表

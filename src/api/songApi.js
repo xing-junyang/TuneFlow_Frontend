@@ -50,7 +50,7 @@ export function deleteSongList(songlistId) {
 // 更新歌单
 export function updateSongList(data) {
     return request({
-        url: '/api/songlists/update',
+        url: '/api/songlists/updateInformation',
         method: 'post',
         data
     })
