@@ -294,7 +294,6 @@ onMounted(async () => {
 	padding: 40px;
 	background-color: var(--color-background-page);
 	color: #ffffff;
-	//overflow: auto;
 	flex: 1;
 }
 

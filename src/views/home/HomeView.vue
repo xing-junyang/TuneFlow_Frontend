@@ -23,8 +23,6 @@ export default {
 	height: calc(100% - var(--player-height));
 	flex-direction: column;
 	overflow: auto;
-	overscroll-behavior: none;
-	//justify-content: center;
 }
 
 /* 定义过渡动画 */

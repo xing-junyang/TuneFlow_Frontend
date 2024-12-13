@@ -13,7 +13,7 @@
 	</div>
 </template>
 <script setup>
-import {computed, onMounted} from 'vue'
+import {computed, onMounted, onUnmounted} from 'vue'
 import { useRoute } from 'vue-router'
 import HeaderComponent from "@/components/Header.vue"
 import PlayerBar from "@/components/Player.vue"
@@ -30,12 +30,23 @@ const showSideBar = computed(() => {
 	return !['login', 'register','upload_song_list'].includes(route.path.slice(1))
 })
 
+function setViewportHeight() {
+	document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+}
+
+
 onMounted(() => {
+	setViewportHeight()
+	window.addEventListener('resize', setViewportHeight)
 	getUserInfo().then(res => {
 		sessionStorage.setItem('userInfo', JSON.stringify(res.data.result))
 	}).catch(err => {
 		console.error('Failed to get user info', err)
 	})
+})
+
+onUnmounted(() => {
+	window.removeEventListener('resize', setViewportHeight)
 })
 </script>
 
@@ -55,7 +66,9 @@ onMounted(() => {
 .root-app {
 	display: flex;
 	flex-direction: column;
-	height: 100vh;
+	height: calc(var(--vh, 1vh) * 100);
+	min-height: calc(var(--vh, 1vh) * 100); /* 确保至少占满视口高度 */
+	max-height: calc(var(--vh, 1vh) * 100); /* 确保不会超过视口高度 */
 }
 
 /* CSS 变量 */
@@ -75,7 +88,6 @@ onMounted(() => {
 	--sidebar-padding: 12px 16px 8px;
 	--sidebar-collapsed-padding: 8px;
 	--sidebar-collapsed-gap: 0;
-	--color-border: var(--color-text-secondary);
 	--drawer-height: 70vh;
 }
 
@@ -117,5 +129,29 @@ onMounted(() => {
 	flex: 1;
 	margin-left: 0;
 	overflow: auto;
+}
+
+@media screen and (pointer: coarse) {
+	@supports (-webkit-backdrop-filter: blur(1px)) and (overscroll-behavior-y: none) {
+		html {
+			min-height: 100.3%;
+			overscroll-behavior-y: none;
+		}
+	}
+}
+
+@media screen and (pointer: coarse) {
+	@supports (-webkit-backdrop-filter: blur(1px)) and (not (overscroll-behavior-y: none)) {
+		html {
+			height: 100%;
+			overflow: hidden;
+		}
+		body {
+			margin: 0;
+			max-height: 100%;
+			overflow: auto;
+			-webkit-overflow-scrolling: touch;
+		}
+	}
 }
 </style>
