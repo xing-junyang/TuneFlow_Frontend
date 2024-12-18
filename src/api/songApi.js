@@ -89,11 +89,3 @@ export function updateSong(songId, data) {
         data
     })
 }
-
-// 添加歌曲到歌单
-export function addSongToSongList(songListId, songId) {
-    return request({
-        url: `/api/songlists/addSong/${songListId}/${songId}`,
-        method: 'post'
-    })
-}

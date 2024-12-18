@@ -69,61 +69,67 @@ const isMySongList = computed(() => {
 const addSongModalVisible = ref(false);
 
 const toggleCollapse = () => {
-  isCollapsed.value = !isCollapsed.value;
+	isCollapsed.value = !isCollapsed.value;
 };
 
 const formatDuration = (seconds) => {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
-  return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+	const minutes = Math.floor(seconds / 60);
+	const remainingSeconds = seconds % 60;
+	return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
 };
 
 const getAudioDuration = async (url) => {
-  const audio = new Audio(url);
-  // get audio duration by url, the url should be a valid audio file
-  return new Promise((resolve) => {
-    audio.addEventListener("loadedmetadata", () => {
-      console.log("Audio duration:", audio.duration);
-      resolve(Math.round(audio.duration));
-    });
-  });
+	const audio = new Audio(url);
+	// get audio duration by url, the url should be a valid audio file
+	return new Promise((resolve) => {
+		audio.addEventListener('loadedmetadata', () => {
+			console.log('Audio duration:', audio.duration);
+			resolve(Math.round(audio.duration));
+		});
+	});
 };
 
 const getAllSongsAudioDuration = async () => {
-  for (let i = 0; i < songs.value.length; i++) {
-    if (songs.value[i].duration !== null) {
-      continue;
-    }
-    songs.value[i].duration = await getAudioDuration(songs.value[i].audioUrl);
-  }
+	for (let i = 0; i < songs.value.length; i++) {
+		if (songs.value[i].duration !== null) {
+			continue;
+		}
+		songs.value[i].duration = await getAudioDuration(songs.value[i].audioUrl);
+	}
 };
 
 const playSong = (index) => {
-  let songsToPlay = [];
-  songsToPlay.push(songs.value[index]);
-  setPlaylistSongs(songsToPlay);
-  playSongFromPlaylist();
+	console.log('Playing song:', index);
+	let songsToPlay = [];
+	console.log(songs.value[index]);
+	songsToPlay.push(songs.value[index])
+	setPlaylistSongs(songsToPlay)
+	playSongFromPlaylist();
+	console.log(playlist)
 };
 
 const playAll = () => {
-  let songsToPlay = [];
-  for (let i = 0; i < songs.value.length; i++) {
-    songsToPlay.push(songs.value[i]);
-  }
-  setPlaylistSongs(songsToPlay);
-  playSongFromPlaylist();
+	console.log('Playing all songs');
+	let songsToPlay = [];
+	for (let i = 0; i < songs.value.length; i++) {
+		songsToPlay.push(songs.value[i]);
+	}
+	setPlaylistSongs(songsToPlay);
+	playSongFromPlaylist();
 };
 
 const addAllToPlayList = () => {
-  try {
-    for (let i = 0; i < songs.value.length; i++) {
-      addSong(songs.value[i]);
-    }
-  } catch (e) {
-    ElMessage.error("添加歌曲到播放列表失败");
-    return;
-  }
-  // ElMessage.success("已添加所有歌曲到播放列表");
+	console.log('Adding all to playlist');
+	try {
+		for (let i = 0; i < songs.value.length; i++) {
+			addSong(songs.value[i]);
+		}
+	} catch (e) {
+		console.error('Failed to add all songs to playlist:', e);
+		ElMessage.error('添加歌曲到播放列表失败');
+		return
+	}
+	ElMessage.success('已添加所有歌曲到播放列表');
 };
 
 const addToPlayList = (index) => {
@@ -153,8 +159,8 @@ const editSongListModalVisible = ref(false);
 const editSongModalVisible = ref(false);
 const editSongId = ref(0);
 const openEditSong = async (index) => {
-  editSongId.value = songs.value[index].id;
-  editSongModalVisible.value = true;
+	editSongId.value = songs.value[index].id;
+	editSongModalVisible.value = true;
 };
 
 const deleteSongListModalVisible = ref(false);
@@ -430,376 +436,369 @@ onMounted(() => {
 
 <style scoped>
 .song-list-detail-main-container {
-  container-type: inline-size;
-  container-name: song-list-detail;
-  display: flex;
-  min-height: fit-content;
-  flex-direction: column;
-  align-items: start;
-  padding: 40px;
-  background-color: var(--color-background-page);
-  color: #ffffff;
-  flex: 1;
+	container-type: inline-size;
+	container-name: song-list-detail;
+	display: flex;
+	min-height: fit-content;
+	flex-direction: column;
+	align-items: start;
+	padding: 40px;
+	background-color: var(--color-background-page);
+	color: #ffffff;
+	flex: 1;
 }
 
 .album-header {
-  display: flex;
-  gap: 32px;
-  margin-bottom: 32px;
-  width: 100%;
+	display: flex;
+	gap: 32px;
+	margin-bottom: 32px;
+	width: 100%;
 }
 
 .album-cover {
-  width: 300px;
-  height: 300px;
-  object-fit: cover;
-  border-radius: 12px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+	width: 300px;
+	height: 300px;
+	object-fit: cover;
+	border-radius: 12px;
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
 .album-name {
-  font-size: 48px;
-  font-weight: bold;
-  text-align: start;
+	font-size: 48px;
+	font-weight: bold;
+	text-align: start;
 }
 
-.album-artist-name {
-  font-size: 24px;
-  text-align: start;
-  color: #b3b3b3;
+.album-artist-name{
+	font-size: 24px;
+	text-align: start;
+	color: #b3b3b3;
 }
 
 .album-info {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
 }
 
 .album-info h1 {
-  font-size: 48px;
-  font-weight: bold;
-  margin: 0 0 16px 0;
+	font-size: 48px;
+	font-weight: bold;
+	margin: 0 0 16px 0;
 }
 
 .album-description {
-  font-size: 16px;
-  text-align: start;
-  color: #b3b3b3;
-  margin: 30px 0 0px 0;
-  line-height: 1.5em;
-  white-space: pre-line;
+	font-size: 16px;
+	text-align: start;
+	color: #b3b3b3;
+	margin: 30px 0 0px 0;
+	line-height: 1.5em;
+	white-space: pre-line;
+
 }
 
 .expand-button {
-  background-color: transparent;
-  border: none;
-  color: #1db954;
-  cursor: pointer;
-  font-size: 14px;
-  padding: 0;
-  text-align: start;
-  transition: color 0.5s ease;
+	background-color: transparent;
+	border: none;
+	color: #1db954;
+	cursor: pointer;
+	font-size: 14px;
+	padding: 0;
+	text-align: start;
+	transition: color 0.5s ease;
 }
 
 .expand-button:hover {
-  color: #00ff5b;
+	color: #00ff5b;
 }
 
 .album-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #b3b3b3;
-  margin-top: 30px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	color: #b3b3b3;
+	margin-top: 30px;
 }
 
 .separator {
-  color: #666;
+	color: #666;
 }
 
 .controls {
-  margin-bottom: 32px;
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  gap: 16px;
+	margin-bottom: 32px;
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	gap: 16px;
 }
 
 .play-all-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background-color: #1db954;
-  border: none;
-  border-radius: 24px;
-  color: white;
-  padding: 12px 32px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.5s ease;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	background-color: #1db954;
+	border: none;
+	border-radius: 24px;
+	color: white;
+	padding: 12px 32px;
+	font-size: 16px;
+	font-weight: bold;
+	cursor: pointer;
+	transition: background-color 0.5s ease;
 }
 
 .play-all-btn:hover {
-  background-color: #1ed760;
+	background-color: #1ed760;
 }
 
 .play-all-btn:disabled {
-  background-color: #666;
-  cursor: not-allowed;
+	background-color: #666;
+	cursor: not-allowed;
 }
 
 .play-all-btn svg {
-  width: 24px;
-  height: 24px;
+	width: 24px;
+	height: 24px;
 }
 
-.edit-song-list-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background-color: #000000;
-  border: white solid 2px;
-  border-radius: 24px;
-  color: white;
-  padding: 12px 32px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.5s ease;
+.edit-song-list-btn{
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	background-color: #000000;
+	border: white solid 2px;
+	border-radius: 24px;
+	color: white;
+	padding: 12px 32px;
+	font-size: 16px;
+	font-weight: bold;
+	cursor: pointer;
+	transition: all 0.5s ease;
 }
 
 .edit-song-list-btn:hover {
-  background-color: rgba(255, 255, 255, 0.25);
+	background-color: rgba(255, 255, 255, 0.25);
 }
 
 .edit-song-list-btn:disabled {
-  background-color: #000000;
-  color: #666666;
-  border: #666666 solid 2px;
-  cursor: not-allowed;
+	background-color: #000000;
+	color: #666666;
+	border: #666666 solid 2px;
+	cursor: not-allowed;
 }
 
 .edit-song-list-btn svg {
-  width: 24px;
-  height: 24px;
+	width: 24px;
+	height: 24px;
 }
 
-.delete-song-list-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background-color: #880000;
-  border: none;
-  border-radius: 24px;
-  color: white;
-  padding: 12px 32px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.5s ease;
+.delete-song-list-btn{
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	background-color: #880000;
+	border: none;
+	border-radius: 24px;
+	color: white;
+	padding: 12px 32px;
+	font-size: 16px;
+	font-weight: bold;
+	cursor: pointer;
+	transition: all 0.5s ease;
 }
 
 .delete-song-list-btn:hover {
-  background-color: #ff4444;
+	background-color: #ff4444;
+
 }
 
 .delete-song-list-btn:disabled {
-  background-color: #666;
-  border: none;
-  cursor: not-allowed;
+	background-color: #666;
+	border: none;
+	cursor: not-allowed;
 }
 
 .delete-song-list-btn svg {
-  width: 24px;
-  height: 24px;
+	width: 24px;
+	height: 24px;
 }
 
 .songs-list {
-  width: 100%;
+	width: 100%;
 }
 
 table {
-  width: 100%;
-  border-collapse: collapse;
+	width: 100%;
+	border-collapse: collapse;
 }
 
 th {
-  text-align: left;
-  padding: 12px;
-  border-bottom: 1px solid #333;
-  color: #b3b3b3;
-  font-weight: normal;
+	text-align: left;
+	padding: 12px;
+	border-bottom: 1px solid #333;
+	color: #b3b3b3;
+	font-weight: normal;
 }
 
 .add-to-playlist-btn {
-  cursor: pointer;
-  width: 24px;
-  line-height: 100%;
+	cursor: pointer;
+	width: 24px;
+	line-height: 100%;
 }
 
-.add-to-playlist-btn i {
-  font-size: 24px;
-  transition: color 0.5s ease;
+.add-to-playlist-btn i{
+	font-size: 24px;
+	transition: color 0.5s ease;
 }
 
 .add-to-playlist-btn i:hover {
-  color: #1db954;
+	color: #1db954;
 }
 
 .song-row {
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
 }
 
 .song-row:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+	background-color: rgba(255, 255, 255, 0.1);
 }
 
 td {
-  padding: 12px;
-  border-bottom: 1px solid #333;
-  text-align: start;
+	padding: 12px;
+	border-bottom: 1px solid #333;
+	text-align: start;
 }
 
 .song-title {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+	display: flex;
+	align-items: center;
+	gap: 12px;
 }
 
 .song-thumbnail {
-  width: 40px;
-  height: 40px;
-  border-radius: 4px;
-  object-fit: cover;
+	width: 40px;
+	height: 40px;
+	border-radius: 4px;
+	object-fit: cover;
 }
 
+
 .loading-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  color: #555;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 100%;
+	color: #555;
 }
 
 .loading-text {
-  margin-top: 16px;
-  font-size: 16px;
-  color: #666;
-  font-weight: bold;
+	margin-top: 16px;
+	font-size: 16px;
+	color: #666;
+	font-weight: bold;
 }
 
 .spinner {
-  width: 30px;
-  height: 30px;
-  border: 5px solid #c4c4c4;
-  border-top: 5px solid #000000;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+	width: 30px;
+	height: 30px;
+	border: 5px solid #c4c4c4;
+	border-top: 5px solid #000000;
+	border-radius: 50%;
+	animation: spin 1s linear infinite;
 }
 
 /* 动画关键帧 */
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
 }
 
 /* 加载文字样式 */
 .loading-container p {
-  margin-top: 16px;
-  font-size: 14px;
-  color: #666;
+	margin-top: 16px;
+	font-size: 14px;
+	color: #666;
 }
 
+
 @container song-list-detail (max-width: 820px) {
-  .song-list-detail-main-container {
-    padding: 20px;
-  }
+	.song-list-detail-main-container {
+		padding: 20px;
+	}
 
-  .album-header {
-    flex-direction: column;
-  }
+	.album-header {
+		flex-direction: column;
+	}
 
-  .album-cover {
-    width: 200px;
-    height: 200px;
-  }
+	.album-cover {
+		width: 200px;
+		height: 200px;
+	}
 
-  .album-info h1 {
-    font-size: 32px;
-  }
+	.album-info h1 {
+		font-size: 32px;
+	}
 
-  th:last-child,
-  td:last-child {
-    display: none;
-  }
+	th:last-child,
+	td:last-child {
+		display: none;
+	}
 }
 
 @container song-list-detail (max-width: 600px) {
-  .album-cover {
-    width: 150px;
-    height: 150px;
-  }
+	.album-cover {
+		width: 150px;
+		height: 150px;
+	}
+	th:nth-child(5), td:nth-child(5) {
+		display: none;
+	}
+	th:nth-child(2), td:nth-child(2) {
+		display: none;
+	}
 
-  th:nth-child(5),
-  td:nth-child(5) {
-    display: none;
-  }
-
-  th:nth-child(2),
-  td:nth-child(2) {
-    display: none;
-  }
 }
 
 @container song-list-detail (max-width: 450px) {
-  .album-cover {
-    width: 80px;
-    height: 80px;
-  }
-
-  th:nth-child(4),
-  td:nth-child(4) {
-    display: none;
-  }
-
-  .play-all-btn {
-    padding: 8px 16px;
-    font-size: 14px;
-  }
-
-  .edit-song-list-btn {
-    padding: 8px 16px;
-    font-size: 14px;
-  }
-
-  .delete-song-list-btn {
-    padding: 8px 16px;
-    font-size: 14px;
-  }
-
-  th {
-    display: none;
-  }
-
-  .controls {
-    flex-direction: column;
-    gap: 16px;
-  }
+	.album-cover {
+		width: 80px;
+		height:80px;
+	}
+	th:nth-child(4), td:nth-child(4) {
+		display: none;
+	}
+	.play-all-btn {
+		padding: 8px 16px;
+		font-size: 14px;
+	}
+	.edit-song-list-btn {
+		padding: 8px 16px;
+		font-size: 14px;
+	}
+	.delete-song-list-btn {
+		padding: 8px 16px;
+		font-size: 14px;
+	}
+	th{
+		display: none;
+	}
+	.controls {
+		flex-direction: column;
+		gap: 16px;
+	}
 }
 
 @container song-list-detail (max-width: 1200px) {
-  .album-cover {
-    width: 240px;
-    height: 240px;
-  }
+	.album-cover {
+		width: 240px;
+		height: 240px;
+	}
 }
 </style>

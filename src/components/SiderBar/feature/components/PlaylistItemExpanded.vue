@@ -154,8 +154,10 @@ defineEmits(['play'])
                 font-weight: 400;
 
                 .title-text {
+                    white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
+                  max-width: 150px;
                     text-align: start;
                     display: block;
                 }

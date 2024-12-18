@@ -20,65 +20,21 @@ const emit = defineEmits(["callback", "closeDeleteSongList"]);
 const songListName = ref("");
 
 const handleAddSongConfirm = async () => {
-  if (!props.isMySongList) {
-    console.log("删除歌单:", props.songListId);
-    const album = await getAlbum(props.songListId)
-      .then((res) => {
-        if (res.data.code === "000") {
-          console.log("歌单:", res.data.data);
-          return res.data.result;
         } else {
-          ElMessage.error("获取歌单信息失败，请检查网络连接");
         }
       })
-      .catch((err) => {
-        console.error("Failed to delete songlist:", err);
-        ElMessage.error("获取歌单信息失败，请检查网络连接");
-      });
     if (!album) {
-      return;
     }
-    console.log("album gonna be deleted:", album);
     for (let songId of album.songsId) {
-      console.log("deleting song:", songId);
-      const ret = await deleteSong(songId)
-        .then((res) => {
-          if (res.code === "000") {
-            console.log("deleted song:", songId);
-            return songId;
           } else {
-            console.error("Failed to delete song:", songId);
-            ElMessage.error("删除歌曲失败，请检查网络连接");
           }
         })
-        .catch((err) => {
-          console.error("Failed to delete song:", songId, err);
-          ElMessage.error("删除歌曲失败，请检查网络连接");
-        });
       if (!ret) {
-        return;
-      }
     }
-    console.log("deleting album:", props.songListId);
   }
-  await deleteAlbum(props.songListId)
-    .then((res) => {
-      if (res.data.code === "000") {
-        ElMessage.success("成功删除歌单" + props.songListName);
-        emit("closeDeleteSongList");
-        getUserSongs();
-        if (route.params.song_list_id == props.songListId) {
-          router.push("/");
-        }
       } else {
-        ElMessage.error("删除歌单失败");
       }
     })
-    .catch((err) => {
-      console.error("Failed to delete album:", err);
-      ElMessage.error("删除歌单失败，请检查网络连接");
-    });
-};
 </script>
 
 <template>
@@ -88,24 +44,8 @@ const handleAddSongConfirm = async () => {
         <label style="color: #ff4444">
           即将删除此歌单或专辑，此操作不可逆！一旦成功，你将永远无法访问到本歌单或专辑。
         </label>
-        <label> 请在下面输入"{{ props.songListName }}"以确认删除 </label>
-        <input
-          type="text"
-          v-model="songListName"
-          required
-          :class="{ 'has-value': songListName }"
-          placeholder="请确认删除"
-        />
-        <span class="mismatch" v-if="songListName && songListName !== props.songListName"
-          >输入有误</span
-        >
       </div>
 
-      <button
-        class="submit-btn"
-        @click="handleAddSongConfirm"
-        :disabled="songListName && songListName !== props.songListName"
-      >
         <span class="material-icons">upload</span>
         确认删除
       </button>
