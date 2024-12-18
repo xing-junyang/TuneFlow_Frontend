@@ -714,7 +714,7 @@ export default {
 	font-weight: 500;
 	margin-bottom: 4px;
 	max-width: 30vw;
-	text-align: start;
+  text-align: start;
 	text-overflow: ellipsis;
 }
 

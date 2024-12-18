@@ -19,12 +19,12 @@ export const songListStore = reactive({
 })
 
 // 获取用户的歌曲列表
-export async function getUserSongs() {
+export function getUserSongs() {
     try {
-        await getUserSongList().then(res => {
-                console.log('获取用户歌单成功:', res)
+        getUserSongList().then(res => {
                 if (res.code === '000') {
-                    songListStore.userSongList = res.result
+                    const userInfo = JSON.parse(sessionStorage.getItem('userInfo'))
+                    songListStore.userSongList = res.result.filter(i => i.userId === userInfo.id);
                 }
                 console.log('获取用户歌单成功:', songListStore.userSongList)
                 return songListStore.userSongList
@@ -118,7 +118,7 @@ export async function removeSongList(songListId) {
 export async function updateSongDataList(songListData) {
     try {
         const res = await updateSongList(songListData)
-        if (res.code === '200') {
+        if (res.code === '000') {
             const index = songListStore.userSongList.findIndex(
                 song => song.id === songListData.id
             )

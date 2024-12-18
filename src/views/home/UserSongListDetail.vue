@@ -1,20 +1,20 @@
 <script setup>
 import { ref, onMounted, computed, watch } from "vue";
 import { useRoute } from "vue-router";
-import { setPlaylistSongs, playSongFromPlaylist, addSong } from "@/global/playlist";
+import {
+  setPlaylistSongs,
+  playSongFromPlaylist,
+  playlist,
+  addSong,
+} from "@/global/playlist";
 import { getAlbum, getAlbumAllSongs } from "@/api/songlistApi";
 import { ElMessage } from "element-plus";
 import Loading from "@/components/Loading.vue";
-import { userSongList } from "@/hooks/useSongs";
 import AddSongToSongList from "@/components/management/AddSongToSongList.vue";
 import DeleteSongFromSongList from "@/components/management/DeleteSongFromSongList.vue";
 import EditSongList from "@/components/management/EditSongList.vue";
 import EditSong from "@/components/management/EditSong.vue";
-import AddSong from "@/components/management/AddSong.vue";
 import DeleteSongList from "@/components/management/DeleteSongList.vue";
-import EditMySongList from "@/components/management/EditMySongList.vue";
-
-const { songs: userSongs } = userSongList();
 
 const route = useRoute();
 const isLoading = ref(false);
@@ -24,19 +24,6 @@ const albumInfo = ref();
 
 // 歌曲列表数据
 const songs = ref([]);
-
-const albumPicUrl = computed(() => {
-  if (!albumInfo.value) {
-    return "";
-  }
-  if (albumInfo.value.pictureUrl) {
-    return albumInfo.value.pictureUrl;
-  }
-  if (songs.value[0]) {
-    return songs.value[0].pictureUrl;
-  }
-  return "";
-});
 
 const isCollapsed = ref(true);
 const limit = 200;
@@ -58,12 +45,6 @@ const isAdmin = computed(() => {
   const userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
   // console.log(userInfo.role);
   return userInfo && userInfo.role === "Admin";
-});
-
-const isMySongList = computed(() => {
-  const currentId = route.params.song_list_id;
-  const currentSong = userSongs.value.find((i) => i.id == currentId);
-  return !!currentSong;
 });
 
 const addSongModalVisible = ref(false);
@@ -99,13 +80,17 @@ const getAllSongsAudioDuration = async () => {
 };
 
 const playSong = (index) => {
+  console.log("Playing song:", index);
   let songsToPlay = [];
+  console.log(songs.value[index]);
   songsToPlay.push(songs.value[index]);
   setPlaylistSongs(songsToPlay);
   playSongFromPlaylist();
+  console.log(playlist);
 };
 
 const playAll = () => {
+  console.log("Playing all songs");
   let songsToPlay = [];
   for (let i = 0; i < songs.value.length; i++) {
     songsToPlay.push(songs.value[i]);
@@ -115,11 +100,13 @@ const playAll = () => {
 };
 
 const addAllToPlayList = () => {
+  console.log("Adding all to playlist", songs);
   try {
     for (let i = 0; i < songs.value.length; i++) {
       addSong(songs.value[i]);
     }
   } catch (e) {
+    console.error("Failed to add all songs to playlist:", e);
     ElMessage.error("添加歌曲到播放列表失败");
     return;
   }
@@ -190,39 +177,20 @@ const getSongListDetail = async () => {
       console.log("Songs in album:", res.data.result);
       songs.value = res.data.result;
     })
-    .catch(() => {
+    .catch((err) => {
+      console.error("Failed to get songs in album:", err);
       ElMessage.error("获取专辑歌曲失败，您可能没有互联网连接");
     });
   await getAllSongsAudioDuration();
   isLoading.value = false;
 };
 
-const editMySongListVisible = ref(false);
-const editMySongForm = ref(null);
-// 编辑我的歌单
-const editMySongList = () => {
-  const currentId = route.params.song_list_id;
-  const currentSong = userSongs.value.find((i) => i.id == currentId);
-  editMySongForm.value = currentSong;
-  editMySongListVisible.value = true;
-};
-
-const addSongVisible = ref(false);
-const addSongId = ref("");
-const addSongToList = (songId) => {
-  addSongVisible.value = true;
-  addSongId.value = songId;
-};
-
-watch(
-  () => route.params.song_list_id,
-  () => {
-    getSongListDetail();
-  }
-);
+watch(() => route.params.song_list_id, () => {
+  getSongListDetail();
+});
 
 onMounted(() => {
-  getSongListDetail();
+	getSongListDetail();
 });
 </script>
 
@@ -231,7 +199,11 @@ onMounted(() => {
     <!-- 专辑头部信息 -->
     <div class="album-header">
       <img
-        :src="albumPicUrl"
+        :src="
+          albumInfo
+            ? albumInfo.pictureUrl
+            : 'http://devops-server-song.oss-cn-nanjing.aliyuncs.com/c3c89d64-6709-4b01-bab8-ca01f1d6ac96_notplaying.jpg'
+        "
         :alt="albumInfo ? albumInfo.name : ''"
         class="album-cover"
       />
@@ -297,23 +269,6 @@ onMounted(() => {
         <i class="fa-solid fa-delete-left"></i>
         删除歌单
       </button>
-      <button
-        class="edit-song-list-btn"
-        @click="editMySongList"
-        :disabled="isLoading"
-        v-if="isMySongList"
-      >
-        编辑我的歌单
-      </button>
-      <button
-        class="delete-song-list-btn"
-        @click="deleteSongListModalVisible = true"
-        :disabled="isLoading"
-        v-if="isMySongList"
-      >
-        <i class="fa-solid fa-delete-left"></i>
-        删除我的歌单
-      </button>
     </div>
 
     <!-- 歌曲列表 -->
@@ -327,7 +282,6 @@ onMounted(() => {
             <th>艺术家</th>
             <th>流派</th>
             <th>时长</th>
-            <th v-if="!isMySongList"></th>
             <th v-if="isAdmin"></th>
             <th v-if="isAdmin"></th>
           </tr>
@@ -348,14 +302,6 @@ onMounted(() => {
             <!-- 根据音频 URL获取时长 -->
             <td @click="playSong(index)">{{ formatDuration(song.duration) }}</td>
 
-            <td
-              v-if="!isMySongList"
-              class="add-to-playlist-btn"
-              @click="addSongToList(song.id)"
-            >
-              <!--						add to playlist button-->
-              <i class="fa-solid fa-add"></i>
-            </td>
             <td v-if="isAdmin" class="add-to-playlist-btn" @click="openEditSong(index)">
               <!--						add to playlist button-->
               <i class="fa-solid fa-file-pen"></i>
@@ -409,21 +355,6 @@ onMounted(() => {
       @closeDeleteSongList="deleteSongListModalVisible = false"
       :songListId="Number(albumInfo.id)"
       :songListName="albumInfo ? albumInfo.name : ''"
-      :isMySongList="isMySongList"
-    />
-
-    <AddSong
-      :songId="addSongId"
-      @closeEditSong="addSongVisible = false"
-      v-if="addSongVisible"
-    />
-
-    <!-- 编辑我的歌单弹窗 -->
-    <EditMySongList
-      v-if="editMySongListVisible"
-      @closeEditMySongList="editMySongListVisible = false"
-      :editSongForm="editMySongForm"
-      @callback="getSongListDetail"
     />
   </div>
 </template>
@@ -706,7 +637,6 @@ td {
   0% {
     transform: rotate(0deg);
   }
-
   100% {
     transform: rotate(360deg);
   }
@@ -748,12 +678,10 @@ td {
     width: 150px;
     height: 150px;
   }
-
   th:nth-child(5),
   td:nth-child(5) {
     display: none;
   }
-
   th:nth-child(2),
   td:nth-child(2) {
     display: none;
@@ -765,31 +693,25 @@ td {
     width: 80px;
     height: 80px;
   }
-
   th:nth-child(4),
   td:nth-child(4) {
     display: none;
   }
-
   .play-all-btn {
     padding: 8px 16px;
     font-size: 14px;
   }
-
   .edit-song-list-btn {
     padding: 8px 16px;
     font-size: 14px;
   }
-
   .delete-song-list-btn {
     padding: 8px 16px;
     font-size: 14px;
   }
-
   th {
     display: none;
   }
-
   .controls {
     flex-direction: column;
     gap: 16px;
