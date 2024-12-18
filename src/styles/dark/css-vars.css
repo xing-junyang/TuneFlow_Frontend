@@ -1,0 +1,26 @@
+
+html.dark {
+    /* 自定义深色背景颜色 */
+    --el-box-shadow-light: none;
+    height: 100vh;
+    height: -webkit-fill-available;
+  }
+
+.el-message{
+    background-color: rgba(25,25,25) !important;
+    color: #fff !important;
+    font-size: 16px !important;
+    font-family: 'Noto Sans SC', sans-serif !important;
+    border: 1px solid rgba(255,255,255,0.05) !important;
+    font-weight: bold;
+    border-radius: 20px !important;
+    box-shadow: 0 0 10px rgba(255,255,255,0.1) !important;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+@supports (-webkit-touch-callout: none) {
+    html {
+        height: -webkit-fill-available;
+    }
+}

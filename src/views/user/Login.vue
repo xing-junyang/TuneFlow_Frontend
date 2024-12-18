@@ -76,9 +76,11 @@
 
 <script>
 import {ref, computed} from 'vue'
-import {login} from "@/api/userApi";
+import {getUserInfo, login} from "@/api/userApi";
 import {getUserName} from "@/utils";
 import router from "@/router";
+import {ElMessage} from "element-plus";
+
 
 export default {
 	name: 'LoginView',
@@ -108,18 +110,26 @@ export default {
 				console.log(res)
 				if (res.data.code === '000') {
 					console.log('登录成功')
+					ElMessage.success('登录成功')
 					sessionStorage.setItem('token', res.data.result)
-					if(rememberMe.value){
-						localStorage.setItem('token', res.data.result)
-					}
-					getUserName();
-					router.push('/')
-					location.reload()
+					getUserInfo().then(res => {
+						console.log(res)
+						sessionStorage.setItem('userInfo', JSON.stringify(res.data.result))
+						if(rememberMe.value){
+							localStorage.setItem('token', res.data.result)
+						}
+						getUserName();
+						router.push('/')
+						location.reload()
+					})
 				} else {
+					ElMessage.error('登录失败： '+res.data.msg)
 					console.error('登录失败： ',res.data.msg)
+
 				}
 			}).catch(err => {
 				console.error(err)
+				ElMessage.error('登录失败，您可能没有互联网连接')
 			})
 		}
 
@@ -142,7 +152,7 @@ export default {
 	display: flex;
 	justify-content: center;
 	align-items: start;
-	background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+	background: var(--color-background-page);
 	padding: 20px;
 }
 

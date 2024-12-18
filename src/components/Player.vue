@@ -2,8 +2,8 @@
 	<div class="player-bar" :class="{ 'player-bar-show': show }">
 		<div class="player-left">
 			<div class="song-container">
-				<div class="song-cover" :class="{ 'rotating': isPlaying }">
-					<img src="@/assets/default-cover.png" alt="cover">
+				<div class="song-cover">
+					<img :src="(currentSong.pictureUrl || 'http://devops-server-song.oss-cn-nanjing.aliyuncs.com/c3c89d64-6709-4b01-bab8-ca01f1d6ac96_notplaying.jpg')" alt="cover">
 				</div>
 				<div class="song-info">
 					<div class="song-name">{{ currentSong.name || '未播放' }}</div>
@@ -38,20 +38,24 @@
 					<i class="fas fa-step-backward"></i>
 				</button>
 				<button class="play-btn" @click="togglePlay">
-					<i :class="isPlaying ? 'fas fa-pause' : 'fas fa-play'"></i>
+					<i :class="['fas', isPlaying ? 'fa-pause' : 'fa-play']"></i>
 				</button>
 				<button class="next-btn" @click="nextSong">
 					<i class="fas fa-step-forward"></i>
 				</button>
 
-				<button class="playlist-btn" @click="togglePlaylist" title="播放列表">
-					<i class="fas fa-list"></i>
+				<button class="playlist-btn" :class="{ active: showPlaylist }" @click="togglePlaylist" title="播放列表">
+					<i class="fa-solid fa-list-ol"></i>
+				</button>
+
+				<button class="lyric-btn" :class="{ active: showLyric }" @click="toggleLyric" title="歌词" :disabled="!currentSong||currentSong.lyricUrl === undefined||currentSong.lyricUrl === ''">
+					<i class="fa-solid fa-square-poll-horizontal"></i>
 				</button>
 			</div>
 
 			<div class="progress-bar">
 				<div class="time">{{ formatTime(currentTime) }}</div>
-				<div class="progress-wrapper" @click="seek">
+				<div class="progress-wrapper" ref="progressSlider" @click="seek" @mousedown.prevent="startProgressChange">
 					<div class="progress-bg"></div>
 					<div class="progress-current" :style="{ width: progress + '%' }"></div>
 					<div class="progress-handle" :style="{ left: progress + '%' }"></div>
@@ -77,7 +81,7 @@
 
 		<audio
 			ref="audioRef"
-			:src="currentSong.path"
+			:src="currentSong.audioUrl"
 			@timeupdate="onTimeUpdate"
 			@loadedmetadata="onLoadMetadata"
 			@ended="onEnded"
@@ -91,7 +95,7 @@
 		<div class="playlist-content">
 			<div class="playlist-header">
 				<div class="header-left">
-					<i class="fas fa-music playlist-icon"></i>
+					<i style="color: #00c853" class="fa-solid fa-list-ol"></i>
 					<h3>播放列表</h3>
 					<span class="song-count">({{ playlist.songs.length }}首)</span>
 				</div>
@@ -113,7 +117,7 @@
 				</button>
 				<button
 					class="delete-btn"
-					@click="clearPlaylist"
+					@click="clickClearPlaylist"
 				>
 					<i class="fas fa-trash-alt"></i>
 					<span>清空列表</span>
@@ -144,7 +148,7 @@
 						@click="playSong(index)"
 					>
 						<div class="song-index">
-							<span v-if="currentSongIndex !== index">{{ index + 1 }}</span>
+							<span v-if="currentSongIndex !== index || !isPlaying">{{ index + 1 }}</span>
 							<i v-else class="fas fa-volume-up playing-icon"></i>
 						</div>
 
@@ -155,7 +159,7 @@
 							<span class="song-artist">{{ song.artist }}</span>
 						</div>
 
-<!--						<div class="song-actions">-->
+						<div class="song-actions">
 <!--							<button-->
 <!--								class="action-btn like-btn"-->
 <!--								:class="{ 'is-liked': song.isLiked }"-->
@@ -164,14 +168,14 @@
 <!--							>-->
 <!--								<i :class="song.isLiked ? 'fas fa-heart' : 'far fa-heart'"></i>-->
 <!--							</button>-->
-<!--							<button-->
-<!--								class="action-btn remove-btn"-->
-<!--								@click.stop="removeSong(index)"-->
-<!--								title="删除"-->
-<!--							>-->
-<!--								<i class="fas fa-times"></i>-->
-<!--							</button>-->
-<!--						</div>-->
+							<button
+								class="action-btn remove-btn"
+								@click.stop="removeSong(index)"
+								title="删除"
+							>
+								<i class="fa-solid fa-delete-left"></i>
+							</button>
+						</div>
 					</li>
 				</TransitionGroup>
 
@@ -181,26 +185,43 @@
 				</div>
 			</div>
 		</div>
+	</div>
+	<!--歌词上拉栏-->
+	<div
+		class="playlist-drawer"
+		:class="{ 'drawer-open': showLyric && show }"
+	>
+		<div class="playlist-content">
+			<div class="playlist-header">
+				<div class="header-left">
+					<i class="fa-solid fa-square-poll-horizontal" style="color: #00c853;"></i>
+					<h3>歌词</h3>
+				</div>
+				<div class="header-right">
+					<button class="header-btn" @click="toggleLyric" title="关闭">
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+			</div>
 
-		<!-- 上拉提示条 -->
-		<div
-			class="drawer-handle"
-			v-show="!showPlaylist"
-			@click="togglePlaylist"
-		>
-			<i class="fas fa-angle-up"></i>
-			<span>播放列表</span>
-			<span class="song-count">({{ playlist.songs.length }})</span>
+			<div class="playlist-container">
+				<Loading v-if="isLoadingLyric" />
+				<div v-else class="song-lyric">
+					<div v-html="songLyric" class="song-lyric-content"></div>
+				</div>
+			</div>
 		</div>
 	</div>
-
 </template>
 
 <script>
-import {playlist} from "@/global/playlist";
+import {clearPlaylist, playlist, playSongFromPlaylistByIndex, removeSong} from "@/global/playlist";
+import Loading from "@/components/Loading.vue";
+import {recordPlayHistory} from "@/api/userApi";
 
 export default {
 	name: 'PlayerBar',
+	components: {Loading},
 	props: {
 		show: {
 			type: Boolean,
@@ -215,16 +236,23 @@ export default {
 			currentTime: 0,
 			duration: 0,
 			isDraggingVolume: false,
+			isDraggingProgress: false,
 			lastVolume: 100,
 			playMode: 'loop', // 'loop' | 'single' | 'random'
 			playlist,
 			showPlaylist: false,
+			showLyric: false,
+			songLyric: '',
+			isLoadingLyric: false,
 			currentSong: {
 				type: {
 					id: Number,
 					name: String,
 					artist: String,
-					path: String,
+					audioUrl: String,
+					pictureUrl: String,
+					genre: String,
+					lyricUrl: String,
 					mark: String,
 					description: String,
 					createTime: String
@@ -232,7 +260,8 @@ export default {
 				default: () => ({})
 			},
 			currentSongIndex: 0,
-			isWideScreen: true
+			isWideScreen: true,
+			isChanging: false,
 		}
 	},
 
@@ -251,13 +280,23 @@ export default {
 	},
 
 	methods: {
-		togglePlay() {
-			if (!this.currentSong.path) return
+		async togglePlay() {
+			if(this.playlist.songs.length === 0) return;
+
+			console.log(this.currentSong.id)
+
+			if ( !this.currentSong || this.currentSong.id === undefined || this.currentSong.id === 0){//Not Loaded
+				console.log("Playing first song in playlist")
+				await this.playSong(0)
+				return;
+			}
+
+			if (this.currentSong.audioUrl === '') return;
 
 			if (this.isPlaying) {
 				this.$refs.audioRef.pause()
 			} else {
-				this.$refs.audioRef.play()
+				await this.$refs.audioRef.play()
 			}
 			this.isPlaying = !this.isPlaying
 		},
@@ -271,36 +310,128 @@ export default {
 
 		togglePlaylist() {
 			this.showPlaylist = !this.showPlaylist
+			this.showLyric = false
 		},
 
-		playSong(index) {
-			this.currentSongIndex = index
-			this.isPlaying = true
-			this.currentSong = this.playlist.songs[index]
+		toggleLyric() {
+			this.showLyric = !this.showLyric
+			this.showPlaylist = false
+		},
 
-			this.playlist.playing = true;
-			this.playlist.currentIndex = index;
+		async loadLyric(){
+			if(this.currentSong.lyricUrl === ''){
+				this.showLyric = false
+				return;
+			}
+			this.isLoadingLyric = true
+			try {
+				const request = new Request(this.currentSong.lyricUrl)
+				const response = await fetch(request)
+				console.log("Lyric response", response)
+				this.songLyric = await response.text()
+				this.songLyric = this.songLyric + "<br><br>"
+			}catch (e){
+				console.log("Error loading lyric", e)
+			}
+			this.isLoadingLyric = false
+		},
+
+		async changeSong(newSong) {
+			if(this.isChanging) return;
+			this.isChanging = true
+			try {
+				if (!newSong || newSong.id === undefined || newSong.id === '') {
+					return
+				}
+				if (newSong.audioUrl && newSong.audioUrl !== '') {
+					//Record History
+					recordPlayHistory(newSong.id).catch(e => {
+						console.log("Error recording play history", e)
+					})
+					//Before playing the song, check if it is already playing.
+					console.log("Is playing?" , this.isPlaying)
+					if (!this.isPlaying) {
+						this.currentSong = newSong
+						console.log("Playing song", newSong)
+						await this.$refs.audioRef.load()
+						this.$refs.audioRef.currentTime = 0
+						await this.$refs.audioRef.play()
+						this.isPlaying = true
+					} else {
+						this.$refs.audioRef.pause()
+						this.currentSong = newSong
+						await this.$refs.audioRef.load()
+						this.$refs.audioRef.currentTime = 0
+						await this.$refs.audioRef.play()
+					}
+					await this.loadLyric()
+					//After this, the song should play.
+				} else if(newSong.pictureUrl === 'http://devops-server-song.oss-cn-nanjing.aliyuncs.com/c3c89d64-6709-4b01-bab8-ca01f1d6ac96_notplaying.jpg'){
+					if(this.isPlaying){
+						this.$refs.audioRef.pause()
+						this.isPlaying = false
+					}
+					this.currentSong = newSong
+				}
+				this.isChanging = false
+			} catch (e) {
+				console.log("Error playing song inside change Song", e)
+				this.isChanging = false
+			}
+		},
+
+		async playSong(index) {
+			if (this.playlist.songs.length === 0) return
+			console.log("Playing song", this.playlist.songs[index])
+			await this.changeSong(this.playlist.songs[index]).catch(
+				e => {
+					console.log("Error playing song in Change Song", e)
+				}
+			)
+			try{
+				this.currentSongIndex = index
+				await playSongFromPlaylistByIndex(index)
+			}catch (e){
+				console.log("Error playing song", e)
+			}
 		},
 
 		removeSong(index) {
 			// 从播放列表中移除歌曲
-			this.playlist.splice(index, 1)
+			removeSong(index)
 			if (index < this.currentSongIndex) {
 				this.currentSongIndex--
-			} else if (index === this.currentSongIndex) {
-				// 如果删除的是当前播放的歌曲，播放下一首
-				this.nextSong()
+			} else if (index === this.currentSongIndex && this.playlist.songs.length > 0) {
+				this.changeSong(this.playlist.songs[index])
+			} else if (index === this.currentSongIndex && this.playlist.songs.length === 0) {
+				this.resetCurrentSong()
 			}
 		},
 
 		prevSong() {
 			if (this.playlist.songs.length === 0) return
 
+			if(this.isPlaying){
+				try {
+					this.$refs.audioRef.pause();
+					this.isPlaying = false
+					this.playlist.playing = false;
+				}catch (e){
+					console.log("Error pausing song", e)
+				}
+			}
+
 			if (this.playMode === 'random') {
 				this.currentSongIndex = Math.floor(Math.random() * this.playlist.songs.length)
 			} else if (this.playMode === 'single') {
-				this.$refs.audioRef.currentTime = 0
-				this.$refs.audioRef.play()
+				this.isPlaying = true
+				try {
+					this.$refs.audioRef.currentTime = 0
+					this.$refs.audioRef.play()
+				}catch (e){
+					console.log("Error playing song", e)
+				}
+				return;
 			} else {
 				this.currentSongIndex = this.currentSongIndex - 1
 				if (this.currentSongIndex < 0) {
@@ -319,8 +450,13 @@ export default {
 				this.currentSongIndex = nextIndex
 			} else if (this.playMode === 'single') {
 				// 单曲循环，重新播放当前歌曲
-				this.$refs.audioRef.currentTime = 0
-				this.$refs.audioRef.play()
+				try {
+					this.$refs.audioRef.currentTime = 0
+					this.$refs.audioRef.play()
+				}catch (e){
+					console.log("Error playing song", e)
+				}
+				return;
 			} else {
 				// 列表循环
 				this.currentSongIndex = (this.currentSongIndex + 1) % this.playlist.songs.length
@@ -380,10 +516,33 @@ export default {
 			this.$refs.audioRef.volume = this.volume / 100
 		},
 
+		startProgressChange(e) {
+			this.isDraggingProgress = true
+			this.seek(e)
+			window.addEventListener('mousemove', this.handleProgressChange)
+			window.addEventListener('mouseup', this.stopProgressChange)
+		},
+
+		handleProgressChange(e) {
+			if (this.isDraggingProgress) {
+				e.preventDefault()
+				this.seek(e)
+			}
+		},
+
+		stopProgressChange() {
+			if (this.isDraggingProgress) {
+				this.isDraggingProgress = false
+				window.removeEventListener('mousemove', this.handleProgressChange)
+				window.removeEventListener('mouseup', this.stopProgressChange)
+			}
+		},
+
 		seek(e) {
-			const rect = e.target.getBoundingClientRect()
+			const progressSlider = this.$refs.progressSlider
+			const rect = progressSlider.getBoundingClientRect()
 			const x = e.clientX - rect.left
-			const percentage = x / rect.width
+			const percentage = Math.min(x / rect.width, 0.999); //防止闪烁
 			const newTime = this.duration * percentage
 			this.currentTime = newTime
 			this.$refs.audioRef.currentTime = newTime
@@ -408,40 +567,79 @@ export default {
 			return `${minutes}:${seconds.toString().padStart(2, '0')}`
 		},
 
-		playAll(){
+		async playAll(){
 			this.currentSongIndex = 0
+			await this.changeSong(this.playlist.songs[0]).catch(e => {
+				console.log("Error playing song", e)
+			})
 			this.isPlaying = true
-			this.currentSong = this.playlist.songs[0]
+			this.playlist.playing = true
+			this.playlist.currentIndex = 0
 		},
 
-		clearPlaylist(){
-			this.playlist.songs = []
-			this.playlist.playing = false
-			this.playlist.currentIndex = 0
-			this.currentSong = {}
+		async resetCurrentSong(){
+			try {
+				this.$refs.audioRef.pause()
+			}catch (e){
+				console.log("Error pausing song", e)
+			}
+			const emptySong = {
+				id: 0,
+				name: '',
+				artist: '',
+				audioUrl: '',
+				pictureUrl: 'http://devops-server-song.oss-cn-nanjing.aliyuncs.com/c3c89d64-6709-4b01-bab8-ca01f1d6ac96_notplaying.jpg',
+				genre: '',
+				lyricUrl: '',
+				mark: '',
+				description: '',
+				createTime: ''
+			}
+			await this.changeSong(emptySong)
 			this.currentSongIndex = 0
 			this.isPlaying = false
+			this.duration = 0
+			this.currentTime = 0
+		},
+
+		clickClearPlaylist(){
+			this.resetCurrentSong()
+			clearPlaylist();
 		},
 
 		checkScreenWidth() {
-			if (window.innerWidth < 920) {
-				this.isWideScreen = false
-			}
+			this.isWideScreen = window.innerWidth >= 920;
 		},
 	},
 
 
 	watch: {
-		currentSong: {
-			handler(newSong) {
-				if (newSong.path) {
-					this.$nextTick(() => {
-						this.$refs.audioRef.play()
-						this.isPlaying = true
-					})
+		// currentSong: {
+		// 	handler(newSong) {
+		// 		if(!newSong||newSong.id===undefined||newSong.id===''){
+		// 			return
+		// 		}
+		// 		if (newSong.audioUrl && newSong.audioUrl !== '') {
+		// 			this.$nextTick(() => {
+		// 				this.changeSong().catch(e => {
+		// 					console.log("Error playing song", e)
+		// 				})
+		// 			})
+		// 		}
+		// 	},
+		// 	deep: true,
+		// 	flush: "post"
+		// },
+		playlist:{
+			async handler(newPlaylist){
+				console.log("Watched playlist change", newPlaylist)
+				this.playlist = newPlaylist
+				if(newPlaylist.jumping){
+					console.log("Playing song from playlist", newPlaylist.currentIndex)
+					await this.playSong(newPlaylist.currentIndex);
 				}
 			},
-			deep: true
+			deep: true,
 		}
 	},
 	mounted() {
@@ -453,6 +651,8 @@ export default {
 	beforeUnmount() {
 		window.removeEventListener('mousemove', this.handleVolumeChange)
 		window.removeEventListener('mouseup', this.stopVolumeChange)
+		window.removeEventListener('mousemove', this.handleProgressChange)
+		window.removeEventListener('mouseup', this.stopProgressChange)
 		window.removeEventListener("resize", this.checkScreenWidth);
 	}
 }
@@ -500,19 +700,6 @@ export default {
 	object-fit: cover;
 }
 
-.rotating {
-	animation: rotate 20s linear infinite;
-}
-
-@keyframes rotate {
-	from {
-		transform: rotate(0deg);
-	}
-	to {
-		transform: rotate(360deg);
-	}
-}
-
 .song-container {
 	display: flex;
 	align-items: center;
@@ -526,6 +713,8 @@ export default {
 	font-size: 16px;
 	font-weight: 500;
 	margin-bottom: 4px;
+	max-width: 30vw;
+	text-overflow: ellipsis;
 }
 
 .song-artist {
@@ -563,14 +752,47 @@ export default {
 	margin: 0 20px;
 }
 
+/* 播放按钮动画 */
+.play-btn i {
+	transition: transform 0.3s ease-in-out;
+}
+
+.play-btn i.fa-play {
+	transform: scale(1);
+}
+
+.play-btn i.fa-pause {
+	transform: scale(1.2);
+}
+
 .mode-btn {
 	font-size: 18px !important;
-	margin: 0 30px;
+	margin: 0 30px 0 30px;
 }
 
 .playlist-btn {
 	font-size: 18px !important;
-	margin: 0 30px;
+	margin: 0 0 0 20px;
+}
+
+.playlist-btn.active {
+	color: #1db954;
+}
+
+.lyric-btn{
+	font-size: 18px !important;
+}
+
+.lyric-btn.active {
+	color: #1db954;
+}
+
+.lyric-btn:disabled{
+	color: #999;
+}
+
+.lyric-btn:disabled:hover{
+	color: #999;
 }
 
 .progress-bar {
@@ -610,7 +832,7 @@ export default {
 	bottom: 0;
 	background: #1db954;
 	border-radius: 2px;
-	transition: width 0.1s linear;
+	//transition: width 0.1s linear;
 }
 
 .progress-handle {
@@ -621,7 +843,7 @@ export default {
 	background: #fff;
 	border-radius: 50%;
 	transform: translate(-50%, -50%);
-	transition: all 0.2s;
+	//transition: all 0.2s;
 	opacity: 0;
 }
 
@@ -694,7 +916,7 @@ export default {
 
 .playlist-drawer {
 	position: fixed;
-	left: 0;
+	right: 0;
 	bottom: var(--player-height);
 	width: var(--now-playing-width);
 	background: var(--color-background);
@@ -702,7 +924,7 @@ export default {
 	transform: translateY(100%);
 	opacity: 0;
 	transition: all 0.5s ease;
-	z-index: 1 !important;
+	z-index: 999 !important;
 	border-top-right-radius: 12px;
 	border-top-left-radius: 12px;
 	box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
@@ -715,7 +937,7 @@ export default {
 }
 
 .playlist-content {
-	height: 70vh;
+	height: var(--drawer-height);
 	max-height: 600px;
 	display: flex;
 	flex-direction: column;
@@ -726,7 +948,6 @@ export default {
 	justify-content: space-between;
 	align-items: center;
 	padding: 16px 20px;
-	border-bottom: 1px solid var(--color-border);
 	background: var(--color-background-light);
 }
 
@@ -776,7 +997,7 @@ export default {
 .playlist-actions {
 	display: flex;
 	gap: 12px;
-	padding: 16px 20px;
+	padding: 4px 20px 16px;
 	background: var(--color-background-light);
 }
 
@@ -793,6 +1014,7 @@ export default {
 
 .play-all-btn {
 	background: var(--color-primary);
+	border: 1px solid var(--color-primary-dark);
 	color: white;
 }
 
@@ -882,6 +1104,7 @@ export default {
 	color: var(--color-text-secondary);
 	font-size: 14px;
 	white-space: nowrap;
+	text-align: start;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
@@ -898,7 +1121,12 @@ export default {
 }
 
 .action-btn {
-	padding: 6px;
+	width: 30px;
+	height: 30px;
+	padding-right: 4px;
+	padding-left: 2px;
+	border-radius: 25%;
+	border: none;
 	color: var(--color-text-secondary);
 	transition: all 0.2s ease;
 }
@@ -926,36 +1154,49 @@ export default {
 	margin-bottom: 16px;
 }
 
-.drawer-handle {
-	position: absolute;
-	top: -32px;
-	left: 0;
-	right: 0;
-	height: 32px;
-	background: var(--color-background);
-	border-top-right-radius: 12px;
-	border-top-left-radius: 12px;
+.lyric-container {
+	flex: 1;
+	overflow: scroll;
+	overscroll-behavior: none;
+	position: relative;
+}
+
+
+.song-lyric{
+	overflow: scroll;
+	overscroll-behavior: none;
 	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 8px;
-	cursor: pointer;
-	color: var(--color-text-secondary);
+	overflow-y: auto;
+	height: 100%;
+}
+
+.song-lyric-content{
+	flex: 1;
+	white-space: pre-wrap;
+	padding: 20px;
+	text-align: start;
 	font-size: 14px;
-	transition: all 0.2s ease;
+	font-weight: normal;
+	color: #eee;
 }
 
-.drawer-handle:hover {
-	color: var(--color-primary);
-	background: var(--color-background-light);
+.song-lyric-content:after{
+	content: '';
+	display: block;
+	height: 20px;
 }
 
-.drawer-handle i {
-	transition: transform 0.2s ease;
+i{
+	animation: change 0.2s forwards;
 }
 
-.drawer-handle:hover i {
-	transform: translateY(-2px);
+@keyframes change {
+	0% {
+		transform: scale(0.8);
+	}
+	100% {
+		transform: scale(1);
+	}
 }
 
 /* 列表动画 */
@@ -991,7 +1232,7 @@ export default {
 @media screen and (max-width: 920px) {
 	.player-bar {
 		padding: 0 10px;
-		height: 120px;
+		height: var(--player-height);
 		flex-direction: column;
 		justify-content: center;
 	}
@@ -1042,11 +1283,17 @@ export default {
 
 	.progress-bar {
 		padding: 0 10px;
+		margin-bottom: 10px;
 	}
 
 	.time {
 		min-width: 35px;
 		font-size: 10px;
+	}
+
+	.song-name {
+		text-overflow: ellipsis;
+		max-width: 30vw;
 	}
 }
 </style>

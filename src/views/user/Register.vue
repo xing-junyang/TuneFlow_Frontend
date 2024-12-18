@@ -129,6 +129,7 @@
 import {ref, computed} from 'vue'
 import {register} from "@/api/userApi";
 import router from "@/router";
+import {ElMessage} from "element-plus";
 
 export default {
 	name: 'RegisterView',
@@ -195,19 +196,22 @@ export default {
 				password: password.value,
 				agreeToTerms: agreeToTerms.value
 			})
-			register("USER", username.value, phone.value, password.value, "Create User")
+			register(username.value, phone.value, password.value)
 				.then(response => {
 					console.log(response)
 					if (response.data.code === '000') {
 						console.log('注册成功')
+						ElMessage.success('注册成功')
 						sessionStorage.setItem('phone', phone.value)
 						router.push('/login')
 					} else {
+						ElMessage.error('注册失败： ' + response.data.msg)
 						console.error('注册失败', response.data.msg)
 					}
 				})
 				.catch(error => {
 					console.error(error)
+					ElMessage.error('注册失败，您可能没有互联网连接')
 				})
 		}
 
@@ -238,7 +242,7 @@ export default {
 	display: flex;
 	justify-content: center;
 	align-items: start;
-	background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+	background: var(--color-background-page);
 	padding: 20px;
 }
 

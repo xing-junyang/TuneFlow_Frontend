@@ -19,6 +19,7 @@ include:
   - template: SAST.gitlab-ci.yml
   - template: Dependency-Scanning.gitlab-ci.yml
 
+
 nodejs-scan-sast:
   tags: [ docker ]
 
