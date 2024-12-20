@@ -34,6 +34,10 @@
 					<i v-else class="fas fa-random"></i>
 				</button>
 
+				<button class="playlist-btn" :class="{ active: showPlaylist }" @click="togglePlaylist" title="播放列表">
+					<i class="fa-solid fa-list-ol"></i>
+				</button>
+
 				<button class="prev-btn" @click="prevSong">
 					<i class="fas fa-step-backward"></i>
 				</button>
@@ -44,12 +48,12 @@
 					<i class="fas fa-step-forward"></i>
 				</button>
 
-				<button class="playlist-btn" :class="{ active: showPlaylist }" @click="togglePlaylist" title="播放列表">
-					<i class="fa-solid fa-list-ol"></i>
-				</button>
-
 				<button class="lyric-btn" :class="{ active: showLyric }" @click="toggleLyric" title="歌词" :disabled="!currentSong||currentSong.lyricUrl === undefined||currentSong.lyricUrl === ''">
 					<i class="fa-solid fa-square-poll-horizontal"></i>
+				</button>
+
+				<button class="lyric-btn" @click="openComment" title="评论" :disabled="currentSong.id===undefined||currentSong.id===0">
+					<i class="fa-solid fa-comment"></i>
 				</button>
 			</div>
 
@@ -212,16 +216,19 @@
 			</div>
 		</div>
 	</div>
+
+	<Comment v-if="showComment" @closeComment="showComment = false" :id="currentSong.id" :is-song-list="false" />
 </template>
 
 <script>
 import {clearPlaylist, playlist, playSongFromPlaylistByIndex, removeSong} from "@/global/playlist";
 import Loading from "@/components/Loading.vue";
 import {recordPlayHistory} from "@/api/userApi";
+import Comment from "@/components/Comment.vue";
 
 export default {
 	name: 'PlayerBar',
-	components: {Loading},
+	components: {Comment, Loading},
 	props: {
 		show: {
 			type: Boolean,
@@ -243,6 +250,7 @@ export default {
 			showPlaylist: false,
 			showLyric: false,
 			songLyric: '',
+			showComment: false,
 			isLoadingLyric: false,
 			currentSong: {
 				type: {
@@ -316,6 +324,10 @@ export default {
 		toggleLyric() {
 			this.showLyric = !this.showLyric
 			this.showPlaylist = false
+		},
+
+		openComment(){
+			this.showComment = true;
 		},
 
 		async loadLyric(){
@@ -742,6 +754,7 @@ export default {
 	padding: 5px 10px;
 	cursor: pointer;
 	transition: all 0.2s;
+
 }
 
 .control-buttons button:hover {
@@ -766,14 +779,20 @@ export default {
 	transform: scale(1.2);
 }
 
+.prev-btn{
+	margin-left: 30px;
+}
+
+.next-btn{
+	margin-right: 30px;
+}
+
 .mode-btn {
 	font-size: 18px !important;
-	margin: 0 30px 0 30px;
 }
 
 .playlist-btn {
 	font-size: 18px !important;
-	margin: 0 0 0 20px;
 }
 
 .playlist-btn.active {

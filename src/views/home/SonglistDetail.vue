@@ -10,6 +10,7 @@ import DeleteSongFromSongList from "@/components/management/DeleteSongFromSongLi
 import EditSongList from "@/components/management/EditSongList.vue";
 import EditSong from "@/components/management/EditSong.vue";
 import DeleteSongList from "@/components/management/DeleteSongList.vue";
+import Comment from "@/components/Comment.vue";
 
 const route = useRoute();
 const isLoading = ref(false);
@@ -139,6 +140,10 @@ const openEditSong = async (index) => {
 
 const deleteSongListModalVisible = ref(false);
 
+const commentModalVisible = ref(false);
+const openCommentModal = () => {
+	commentModalVisible.value = true;
+};
 onMounted(async () => {
 	console.log('Song list detail view mounted');
 	isLoading.value = true;
@@ -208,6 +213,10 @@ onMounted(async () => {
 			<button class="edit-song-list-btn" @click="addAllToPlayList" :disabled="isLoading">
 				<i class="fa-solid fa-square-plus"></i>
 				添加所有歌曲到播放列表
+			</button>
+			<button class="edit-song-list-btn" @click="openCommentModal" :disabled="isLoading">
+				<i class="fa-solid fa-comment"></i>
+				查看歌单评论
 			</button>
 			<button class="edit-song-list-btn" @click="addSongModalVisible = true" :disabled="isLoading" v-if="isAdmin">
 				添加歌曲
@@ -279,6 +288,9 @@ onMounted(async () => {
 
 		<!-- 删除歌单弹窗 -->
 		<DeleteSongList v-if="deleteSongListModalVisible" @closeDeleteSongList="deleteSongListModalVisible = false" :songListId="Number(albumInfo.id)" :songListName="albumInfo?albumInfo.name:''" />
+
+		<!-- 查看评论弹窗 -->
+		<Comment v-if="commentModalVisible" @closeComment="commentModalVisible = false" :id="Number(albumInfo.id)" :is-song-list="true"/>
 	</div>
 
 </template>
