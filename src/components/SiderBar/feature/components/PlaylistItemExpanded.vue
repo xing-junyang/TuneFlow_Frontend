@@ -154,7 +154,6 @@ defineEmits(['play'])
                 font-weight: 400;
 
                 .title-text {
-                    white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
                     text-align: start;
@@ -173,6 +172,7 @@ defineEmits(['play'])
                         overflow: hidden;
                         text-overflow: ellipsis;
                         display: block;
+                        text-align: left;
                     }
                 }
             }
