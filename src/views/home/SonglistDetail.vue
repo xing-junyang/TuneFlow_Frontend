@@ -253,7 +253,7 @@ onMounted(() => {
           {{ isCollapsed ? "展开" : "收起" }}
         </button>
         <div class="album-meta">
-          <span class="rating">★ {{ albumInfo ? albumInfo.mark : 5 }}</span>
+          <span class="rating">★ {{ albumInfo ? albumInfo.mark.toFixed(1) : 5 }}</span>
           <span class="separator">•</span>
           <span class="date" v-if="albumInfo && albumInfo.year">{{
             albumInfo && albumInfo.year ? albumInfo.year : "1970"
